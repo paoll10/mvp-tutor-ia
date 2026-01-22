@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+
+<meta charset="utf-8"/>
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<title>EduPlatform Login</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<script id="tailwind-config">
+
+        tailwind.config = {
+
+            darkMode: "class",
+
+            theme: {
+
+            extend: {
+
+                colors: {
+
+                    "primary": "#15737f",
+
+                    "primary-dark": "#0e5660",
+
+                    "background-light": "#f4f9fb",
+
+                    "background-dark": "#2a2c2d",
+
+                    "surface-light": "#ffffff",
+
+                    "surface-dark": "#36383a",
+
+                    "text-main": "#0e191a",
+
+                    "text-muted": "#518c94",
+
+                },
+
+                fontFamily: {
+
+                    "display": ["Epilogue", "sans-serif"],
+
+                    "body": ["Manrope", "sans-serif"],
+
+                },
+
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+
+                boxShadow: {
+
+                    "soft": "0 10px 40px -10px rgba(0,0,0,0.08)",
+
+                }
+
+            },
+
+            },
+
+        }
+
+    </script>
+
+<style>
+
+        body {
+
+            font-family: 'Manrope', sans-serif;
+
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+
+            font-family: 'Epilogue', sans-serif;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col transition-colors duration-300">
+
+<header class="w-full border-b border-[#e8f1f2] dark:border-gray-700 bg-surface-light dark:bg-surface-dark px-6 py-4 lg:px-12">
+
+<div class="mx-auto flex max-w-7xl items-center justify-between">
+
+<div class="flex items-center gap-3 text-primary dark:text-white">
+
+<div class="flex items-center justify-center size-8 rounded-lg bg-primary/10 dark:bg-white/10 text-primary dark:text-white">
+
+<span class="material-symbols-outlined text-[20px]">school</span>
+
+</div>
+
+<h2 class="text-xl font-bold leading-tight tracking-tight text-text-main dark:text-white font-display">EduPlatform</h2>
+
+</div>
+
+<div class="hidden sm:flex items-center gap-6">
+
+<a class="text-text-main dark:text-white/80 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Início</a>
+
+<a class="text-text-main dark:text-white/80 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Central de Ajuda</a>
+
+</div>
+
+</div>
+
+</header>
+
+<main class="flex-1 flex items-center justify-center p-4 sm:p-8">
+
+<div class="w-full max-w-md bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft p-8 sm:p-10 border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+
+<div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/40 via-primary to-primary/40"></div>
+
+<div class="mb-8 text-center">
+
+<h1 class="text-3xl font-bold text-text-main dark:text-white mb-2">Bem-vindo de volta</h1>
+
+<p class="text-text-muted dark:text-gray-400 text-sm">Escolha seu perfil para continuar</p>
+
+</div>
+
+<div class="mb-8">
+
+<div class="relative flex w-full bg-[#e8f1f2] dark:bg-gray-700 rounded-lg p-1 h-12">
+
+<div class="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-surface-light dark:bg-gray-600 rounded-md shadow-sm transition-transform duration-300 ease-in-out transform translate-x-0 peer-checked:translate-x-full"></div>
+
+<label class="flex-1 relative z-10 cursor-pointer">
+
+<input checked="" class="peer sr-only" name="role" type="radio" value="student"/>
+
+<div class="flex h-full w-full items-center justify-center rounded-md text-sm font-medium transition-colors text-primary dark:text-white peer-checked:text-primary peer-checked:font-bold dark:peer-checked:text-white">
+
+                            Aluno
+
+                        </div>
+
+</label>
+
+<label class="flex-1 relative z-10 cursor-pointer">
+
+<input class="peer sr-only" name="role" type="radio" value="mentor"/>
+
+<div class="flex h-full w-full items-center justify-center rounded-md text-sm font-medium text-text-muted dark:text-gray-400 transition-colors peer-checked:text-primary peer-checked:font-bold dark:peer-checked:text-white">
+
+                            Mentor
+
+                        </div>
+
+</label>
+
+<div class="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] bg-white dark:bg-gray-600 shadow-sm rounded-md transition-all duration-300 ease-out pointer-events-none" id="toggle-bg" style="transform: translateX(0%);"></div>
+
+<script>
+
+                        const radios = document.querySelectorAll('input[name="role"]');
+
+                        const toggleBg = document.getElementById('toggle-bg');
+
+                        const subheadline = document.querySelector('p.text-text-muted');
+
+                        radios.forEach((radio, index) => {
+
+                            radio.addEventListener('change', (e) => {
+
+                                if (e.target.checked) {
+
+                                    toggleBg.style.transform = `translateX(${index * 100}%)`;
+
+                                    if (e.target.value === 'mentor') {
+
+                                        subheadline.textContent = 'Inspire a próxima geração';
+
+                                    } else {
+
+                                        subheadline.textContent = 'Inicie sua jornada de aprendizado';
+
+                                    }
+
+                                }
+
+                            });
+
+                        });
+
+                    </script>
+
+</div>
+
+</div>
+
+<form class="space-y-5" onsubmit="event.preventDefault();">
+
+<div class="space-y-1.5">
+
+<label class="block text-sm font-medium text-text-main dark:text-gray-200" for="email">Endereço de E-mail</label>
+
+<div class="relative group/input">
+
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted dark:text-gray-500 group-focus-within/input:text-primary dark:group-focus-within/input:text-primary">
+
+<span class="material-symbols-outlined text-[20px]">mail</span>
+
+</div>
+
+<input class="block w-full pl-10 pr-3 py-3 border border-[#d1e3e6] dark:border-gray-600 rounded-lg bg-background-light dark:bg-gray-800 text-text-main dark:text-white placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" id="email" placeholder="nome@exemplo.com" type="email"/>
+
+</div>
+
+</div>
+
+<div class="space-y-1.5">
+
+<div class="flex items-center justify-between">
+
+<label class="block text-sm font-medium text-text-main dark:text-gray-200" for="password">Senha</label>
+
+<a class="text-sm font-medium text-primary hover:text-primary-dark dark:hover:text-cyan-400 transition-colors" href="#">Esqueceu a senha?</a>
+
+</div>
+
+<div class="relative group/input">
+
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted dark:text-gray-500 group-focus-within/input:text-primary dark:group-focus-within/input:text-primary">
+
+<span class="material-symbols-outlined text-[20px]">lock</span>
+
+</div>
+
+<input class="block w-full pl-10 pr-10 py-3 border border-[#d1e3e6] dark:border-gray-600 rounded-lg bg-background-light dark:bg-gray-800 text-text-main dark:text-white placeholder-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm" id="password" placeholder="Digite sua senha" type="password"/>
+
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-text-muted hover:text-primary dark:hover:text-white transition-colors">
+
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:-translate-y-0.5" type="submit">
+
+<span>Entrar</span>
+
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+
+</button>
+
+</form>
+
+<div class="relative my-8">
+
+<div class="absolute inset-0 flex items-center">
+
+<div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+
+</div>
+
+<div class="relative flex justify-center text-sm">
+
+<span class="px-2 bg-surface-light dark:bg-surface-dark text-text-muted dark:text-gray-400">Ou continue com</span>
+
+</div>
+
+</div>
+
+<div class="grid grid-cols-2 gap-3">
+
+<button class="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm font-medium text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-200" type="button">
+
+<svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24">
+
+<path d="M12.0003 20.45c4.6667 0 8.5334-3.2333 9.95-7.75H12.0003v-3.4h13.2836c.1333.5667.2167 1.1667.2167 1.8 0 6.6333-5.3666 12-12 12-6.6333 0-12-5.3667-12-12s5.3667-12 12-12c3.2333 0 6.1333 1.1667 8.4167 3.2833l-2.4334 2.4334c-1.5333-1.4667-3.6666-2.3167-5.9833-2.3167-4.9667 0-9 4.0333-9 9s4.0333 9 9 9Z" fill="currentColor"></path>
+
+</svg>
+
+<span>Google</span>
+
+</button>
+
+<button class="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm font-medium text-text-main dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-200" type="button">
+
+<svg aria-hidden="true" class="h-5 w-5 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24">
+
+<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
+
+</svg>
+
+<span>LinkedIn</span>
+
+</button>
+
+</div>
+
+<div class="mt-8 text-center">
+
+<p class="text-sm text-text-muted dark:text-gray-400">
+
+                    Novo por aqui? 
+
+                    <a class="font-semibold text-primary hover:text-primary-dark dark:hover:text-white transition-colors" href="#">Criar uma conta</a>
+
+</p>
+
+</div>
+
+</div>
+
+</main>
+
+<footer class="py-6 text-center text-xs text-text-muted/60 dark:text-gray-500">
+
+<p>© 2024 EduPlatform. Todos os direitos reservados.</p>
+
+<div class="flex justify-center gap-4 mt-2">
+
+<a class="hover:text-text-main dark:hover:text-gray-300" href="#">Política de Privacidade</a>
+
+<a class="hover:text-text-main dark:hover:text-gray-300" href="#">Termos de Serviço</a>
+
+</div>
+
+</footer>
+
+</body></html>

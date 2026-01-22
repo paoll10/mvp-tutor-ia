@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+
+<meta charset="utf-8"/>
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<title>Painel EduPlatform</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<script id="tailwind-config">
+
+        tailwind.config = {
+
+            darkMode: "class",
+
+            theme: {
+
+                extend: {
+
+                    colors: {
+
+                        "primary": "#15737f",
+
+                        "primary-dark": "#0e4f57",
+
+                        "background-light": "#f4f9fb",
+
+                        "background-dark": "#2a2c2d",
+
+                        "surface-light": "#ffffff",
+
+                        "surface-dark": "#333536",
+
+                        "text-main": "#0e191a",
+
+                        "text-secondary": "#518c94",
+
+                    },
+
+                    fontFamily: {
+
+                        "display": ["Epilogue", "sans-serif"],
+
+                        "body": ["Manrope", "sans-serif"],
+
+                    },
+
+                    borderRadius: {
+
+                        "DEFAULT": "0.5rem",
+
+                        "lg": "0.75rem",
+
+                        "xl": "1rem",
+
+                        "2xl": "1.5rem",
+
+                    },
+
+                    boxShadow: {
+
+                        'soft': '0 4px 20px -2px rgba(21, 115, 127, 0.08)',
+
+                    }
+
+                },
+
+            },
+
+        }
+
+    </script>
+
+<style>
+
+        body {
+
+            font-family: 'Manrope', sans-serif;
+
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+
+            font-family: 'Epilogue', sans-serif;
+
+        }
+
+        .material-symbols-outlined {
+
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+
+        }
+
+        .material-symbols-outlined.fill {
+
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+
+        }::-webkit-scrollbar {
+
+            width: 8px;
+
+            height: 8px;
+
+        }
+
+        ::-webkit-scrollbar-track {
+
+            background: transparent;
+
+        }
+
+        ::-webkit-scrollbar-thumb {
+
+            background: #cbd5e1;
+
+            border-radius: 4px;
+
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+
+            background: #94a3b8;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-white overflow-hidden h-screen flex">
+
+<aside class="w-64 h-full bg-surface-light dark:bg-surface-dark border-r border-[#e8f1f2] dark:border-[#444] flex flex-col justify-between p-6 z-20 hidden md:flex shrink-0">
+
+<div class="flex flex-col gap-8">
+
+<div class="flex gap-3 items-center">
+
+<div class="bg-primary/10 rounded-xl size-10 flex items-center justify-center text-primary">
+
+<span class="material-symbols-outlined fill">school</span>
+
+</div>
+
+<div class="flex flex-col">
+
+<h1 class="text-text-main dark:text-white text-lg font-bold leading-none tracking-tight">EduPlatform</h1>
+
+<p class="text-text-secondary text-xs font-medium mt-1">Painel do Mentor</p>
+
+</div>
+
+</div>
+
+<nav class="flex flex-col gap-2">
+
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary transition-colors group" href="#">
+
+<span class="material-symbols-outlined fill">dashboard</span>
+
+<span class="text-sm font-bold">Painel</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="#">
+
+<span class="material-symbols-outlined">chat_bubble</span>
+
+<span class="text-sm font-medium">Mensagens</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="#">
+
+<span class="material-symbols-outlined">calendar_month</span>
+
+<span class="text-sm font-medium">Agenda</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="#">
+
+<span class="material-symbols-outlined">folder_open</span>
+
+<span class="text-sm font-medium">Recursos</span>
+
+</a>
+
+</nav>
+
+</div>
+
+<div class="flex flex-col gap-4">
+
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="#">
+
+<span class="material-symbols-outlined">settings</span>
+
+<span class="text-sm font-medium">Configurações</span>
+
+</a>
+
+<div class="pt-4 border-t border-[#e8f1f2] dark:border-[#444]">
+
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-[#e8f1f2] dark:hover:bg-[#444] cursor-pointer transition-colors">
+
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200" data-alt="Portrait of a user" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQXRAyfhnnvFUTmzkIRu-VV8benrw5RKQesP1DZggJnEDZY04yDKNn8mnrY42hH90LXYYzPxQM_zHU53jP0q41c_Pl5EZ76npdQpSfupwqIcXczHgDoTImYycMpjFCUd-v7JVwUTVDk31087QuA7CO1mcZlXgichJy6CSKi8ZkgLx2Yc571l8TAFH4CA3HETuOr3X8tBy_YZfvw8sHO222Z_sylF50I-jTtHBOVOsUo45VAJkr_5Rf1urNkcRP90nTyxWIJQm1-yk");'></div>
+
+<div class="flex flex-col overflow-hidden">
+
+<p class="text-sm font-bold truncate">Alex Morgan</p>
+
+<p class="text-xs text-text-secondary truncate">Mentor Sênior</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+<header class="h-20 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-[#e8f1f2] dark:border-[#444] px-8 flex items-center justify-between shrink-0 z-10 sticky top-0">
+
+<div class="flex items-center gap-4">
+
+<button class="md:hidden p-2 text-text-secondary hover:text-text-main">
+
+<span class="material-symbols-outlined">menu</span>
+
+</button>
+
+<div class="flex flex-col">
+
+<h2 class="text-xl font-bold tracking-tight text-text-main dark:text-white">Visão Geral dos Cursos</h2>
+
+<p class="text-xs text-text-secondary hidden sm:block">Gerencie seu currículo e alunos</p>
+
+</div>
+
+</div>
+
+<div class="flex items-center gap-6">
+
+<div class="hidden md:flex items-center bg-[#f0f5f6] dark:bg-[#444] rounded-lg px-4 h-10 w-64 border border-transparent focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+
+<span class="material-symbols-outlined text-text-secondary text-[20px]">search</span>
+
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-text-main dark:text-white placeholder-text-secondary h-full" placeholder="Pesquisar cursos..." type="text"/>
+
+</div>
+
+<div class="flex items-center gap-2">
+
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-[#e8f1f2] dark:hover:bg-[#444] text-text-secondary transition-colors relative">
+
+<span class="material-symbols-outlined">notifications</span>
+
+<span class="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-[#333]"></span>
+
+</button>
+
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-[#e8f1f2] dark:hover:bg-[#444] text-text-secondary transition-colors">
+
+<span class="material-symbols-outlined">chat</span>
+
+</button>
+
+</div>
+
+</div>
+
+</header>
+
+<div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8">
+
+<section class="bg-gradient-to-r from-[#15737f] to-[#0e4f57] rounded-2xl p-6 md:p-10 shadow-soft relative overflow-hidden group">
+
+<div class="absolute right-0 top-0 h-full w-1/2 opacity-10 pointer-events-none">
+
+<svg class="h-full w-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+<path d="M44.7,-76.4C58.9,-69.2,71.8,-59.1,79.6,-46.9C87.4,-34.7,90.1,-20.4,85.8,-7.1C81.5,6.2,70.2,18.5,60.2,28.8C50.2,39.1,41.5,47.4,31.7,53.4C21.9,59.4,11,63.1,-0.8,64.5C-12.6,65.9,-25.2,65,-36.5,59.9C-47.8,54.8,-57.8,45.5,-66.1,34.4C-74.4,23.3,-81,10.4,-79.8,-1.9C-78.6,-14.2,-69.6,-25.9,-59.6,-35.6C-49.6,-45.3,-38.6,-53,-27,-61.7C-15.4,-70.4,-3.2,-80.1,10.1,-81.9L10.1,0L0,0Z" fill="#FFFFFF" transform="translate(100 100)"></path>
+
+</svg>
+
+</div>
+
+<div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+<div class="max-w-lg text-white">
+
+<h2 class="text-2xl md:text-3xl font-bold mb-2">Expanda sua base de conhecimento</h2>
+
+<p class="text-white/80 text-sm md:text-base mb-6">Insira um código de curso único fornecido por outro instrutor para se inscrever como aluno ou colaborador.</p>
+
+<label class="flex w-full max-w-md h-12 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 p-1 focus-within:bg-white/20 focus-within:border-white/40 transition-all">
+
+<input class="flex-1 bg-transparent border-none text-white placeholder-white/60 focus:ring-0 text-sm px-4" placeholder="Insira o Código do Curso (ex: A1B2-C3D4)"/>
+
+<button class="bg-white text-primary hover:bg-white/90 px-6 rounded font-bold text-sm transition-colors">
+
+                                Entrar
+
+                            </button>
+
+</label>
+
+</div>
+
+<div class="hidden lg:block bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+
+<div class="flex items-center gap-3 mb-3">
+
+<div class="size-10 rounded-full bg-white/20 flex items-center justify-center text-white">
+
+<span class="material-symbols-outlined">verified</span>
+
+</div>
+
+<div class="text-white">
+
+<div class="font-bold text-sm">Código Válido</div>
+
+<div class="text-xs opacity-70">Acesso Concedido</div>
+
+</div>
+
+</div>
+
+<div class="h-2 w-40 bg-white/20 rounded-full overflow-hidden">
+
+<div class="h-full w-2/3 bg-[#7BC079]"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="flex flex-col gap-6">
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+<h3 class="text-2xl font-bold text-text-main dark:text-white">Meus Cursos Criados</h3>
+
+<button class="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 group">
+
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform duration-300">add</span>
+
+<span class="font-bold text-sm">Criar Novo Curso</span>
+
+</button>
+
+</div>
+
+<div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+
+<button class="px-4 py-1.5 rounded-full bg-text-main text-white text-sm font-medium whitespace-nowrap">Todos os Cursos</button>
+
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#333] border border-[#e8f1f2] dark:border-[#555] text-text-secondary hover:text-text-main text-sm font-medium whitespace-nowrap transition-colors">Publicados</button>
+
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#333] border border-[#e8f1f2] dark:border-[#555] text-text-secondary hover:text-text-main text-sm font-medium whitespace-nowrap transition-colors">Rascunhos</button>
+
+<button class="px-4 py-1.5 rounded-full bg-white dark:bg-[#333] border border-[#e8f1f2] dark:border-[#555] text-text-secondary hover:text-text-main text-sm font-medium whitespace-nowrap transition-colors">Arquivados</button>
+
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+<div class="group bg-surface-light dark:bg-surface-dark border border-[#e8f1f2] dark:border-[#444] rounded-2xl overflow-hidden hover:shadow-soft hover:border-primary/30 transition-all duration-300 flex flex-col h-full">
+
+<div class="h-48 bg-gray-100 relative overflow-hidden">
+
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Abstract geometric shapes in teal and white" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAsY8Vu2tW6wynrwXeumRr0GKhp8t3r9WrGwoXB56ZgKzIaUSAiIxeGLEAeCPeCVbNL9JYeJKnt_o3ZSw8CPQDgBWjY49ZhLo-9W7h8QZLej5ZnzN1wVMeJWB64pQJ8dicf0_IRdBsOYidq8f8i6sTPWRiAKmmz2EsImmj8eBzINlxHHcdXbQZ57ckYU6r37YUJRwi7eUR3vf6e1h2If7nnm3OzIcE0x_AoiERQ0U0klKhws5IFACVYA2kVTPKsGGk4mcCkVChoDj0');"></div>
+
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2.5 py-1 rounded-md text-xs font-bold text-primary shadow-sm flex items-center gap-1">
+
+<span class="size-2 rounded-full bg-green-500 animate-pulse"></span> Ativo
+
+                            </div>
+
+</div>
+
+<div class="p-5 flex flex-col gap-3 flex-1">
+
+<div class="flex-1">
+
+<h4 class="font-display font-bold text-lg leading-tight text-text-main dark:text-white mb-1 group-hover:text-primary transition-colors">Padrões Avançados de Design de UI</h4>
+
+<p class="text-sm text-text-secondary line-clamp-2">Domine o design de interfaces modernas com princípios de design atômico e layouts responsivos.</p>
+
+</div>
+
+<div class="pt-4 mt-auto border-t border-[#f0f5f6] dark:border-[#444] flex items-center justify-between">
+
+<div class="flex items-center gap-4 text-xs font-medium text-text-secondary">
+
+<div class="flex items-center gap-1.5" title="Alunos Inscritos">
+
+<span class="material-symbols-outlined text-lg">group</span>
+
+<span>24</span>
+
+</div>
+
+<div class="flex items-center gap-1.5" title="Módulos">
+
+<span class="material-symbols-outlined text-lg">layers</span>
+
+<span>8</span>
+
+</div>
+
+</div>
+
+<button class="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-primary/5">
+
+<span class="material-symbols-outlined">more_horiz</span>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="group bg-surface-light dark:bg-surface-dark border border-[#e8f1f2] dark:border-[#444] rounded-2xl overflow-hidden hover:shadow-soft hover:border-primary/30 transition-all duration-300 flex flex-col h-full">
+
+<div class="h-48 bg-gray-100 relative overflow-hidden">
+
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Minimalist desk setup with laptop and coffee" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqKEpmYbpR7HSZ8W_iD5gDUHlhkSY0vL3u-f90IRDrKprrjbWxYkx1kWdoRpQEE6ysRRpi-V8Xb2j4jj3CZZJv_Z2eGM0T_WmtVs_gDCRRdSIIM3Mb60Ur0I7mlwF2HBqYPm13sv7mU61Sy73fZtg9FhgyicXKlnF3ScyFjcZHYUZp7hHLNwY-02waQLoTKqUrIyJwcIgakjBv_uGtsw3KAj4IDLtvmKcdRBPpW1TOI0v8o8fhUTZ_5yOzrBaZHQMrG02GLHH65C4');"></div>
+
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2.5 py-1 rounded-md text-xs font-bold text-orange-500 shadow-sm flex items-center gap-1">
+
+<span class="material-symbols-outlined text-[14px]">edit_document</span> Rascunho
+
+                            </div>
+
+</div>
+
+<div class="p-5 flex flex-col gap-3 flex-1">
+
+<div class="flex-1">
+
+<h4 class="font-display font-bold text-lg leading-tight text-text-main dark:text-white mb-1 group-hover:text-primary transition-colors">Essenciais do React 19</h4>
+
+<p class="text-sm text-text-secondary line-clamp-2">Mergulhe fundo em Server Components, Actions e na nova arquitetura do compilador.</p>
+
+</div>
+
+<div class="pt-4 mt-auto border-t border-[#f0f5f6] dark:border-[#444] flex items-center justify-between">
+
+<div class="flex items-center gap-4 text-xs font-medium text-text-secondary">
+
+<div class="flex items-center gap-1.5">
+
+<span class="material-symbols-outlined text-lg">group</span>
+
+<span>-</span>
+
+</div>
+
+<div class="flex items-center gap-1.5">
+
+<span class="material-symbols-outlined text-lg">layers</span>
+
+<span>12</span>
+
+</div>
+
+</div>
+
+<button class="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-primary/5">
+
+<span class="material-symbols-outlined">more_horiz</span>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="group bg-surface-light dark:bg-surface-dark border border-[#e8f1f2] dark:border-[#444] rounded-2xl overflow-hidden hover:shadow-soft hover:border-primary/30 transition-all duration-300 flex flex-col h-full">
+
+<div class="h-48 bg-gray-100 relative overflow-hidden">
+
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Blue wireframe structures on dark background" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC_HZ_eKR0OYAJw8taNCMw0i5YvVqd0Til5qLGG2_WGk7HPqBkOSebL0SlteUA3EaahvVEZzcKqd-d9aQ2MYvt1eWgFhhFSZkgO-l8oGITs1siP_IwFJOcxmuAkXFZZ9_p7PY-ymGyMxdoFCNwNyTJar--33OFmg2whbpmjK6GQAlCItVK2iqeETZhycOtcB4ymx4L_7AJ71LSW2oxIi2kEeVLoPTmKJL_05m-Nu3jE6TTNwHdLzlLZqrb2yWey9bfkYFMtpV1LUvE');"></div>
+
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2.5 py-1 rounded-md text-xs font-bold text-primary shadow-sm flex items-center gap-1">
+
+<span class="size-2 rounded-full bg-green-500"></span> Ativo
+
+                            </div>
+
+</div>
+
+<div class="p-5 flex flex-col gap-3 flex-1">
+
+<div class="flex-1">
+
+<h4 class="font-display font-bold text-lg leading-tight text-text-main dark:text-white mb-1 group-hover:text-primary transition-colors">Gestão de Produtos 101</h4>
+
+<p class="text-sm text-text-secondary line-clamp-2">Da ideação ao lançamento: gerenciando o ciclo de vida do produto de forma eficaz.</p>
+
+</div>
+
+<div class="pt-4 mt-auto border-t border-[#f0f5f6] dark:border-[#444] flex items-center justify-between">
+
+<div class="flex items-center gap-4 text-xs font-medium text-text-secondary">
+
+<div class="flex items-center gap-1.5">
+
+<span class="material-symbols-outlined text-lg">group</span>
+
+<span>156</span>
+
+</div>
+
+<div class="flex items-center gap-1.5">
+
+<span class="material-symbols-outlined text-lg">star</span>
+
+<span>4.8</span>
+
+</div>
+
+</div>
+
+<button class="text-text-secondary hover:text-primary transition-colors p-1 rounded hover:bg-primary/5">
+
+<span class="material-symbols-outlined">more_horiz</span>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<button class="group bg-[#f8fbfb] dark:bg-[#333] border-2 border-dashed border-[#d1dce0] dark:border-[#555] rounded-2xl flex flex-col items-center justify-center gap-4 p-8 hover:border-primary hover:bg-primary/5 transition-all duration-300 h-full min-h-[340px]">
+
+<div class="size-16 rounded-full bg-white dark:bg-[#444] shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+
+<span class="material-symbols-outlined text-3xl text-primary">add</span>
+
+</div>
+
+<div class="text-center">
+
+<h4 class="font-display font-bold text-lg text-text-main dark:text-white">Novo Curso</h4>
+
+<p class="text-sm text-text-secondary mt-1">Comece do zero ou use um modelo</p>
+
+</div>
+
+</button>
+
+</div>
+
+</section>
+
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#e8f1f2] dark:border-[#444] flex items-center gap-4">
+
+<div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
+
+<span class="material-symbols-outlined">school</span>
+
+</div>
+
+<div>
+
+<p class="text-xs text-text-secondary font-medium uppercase tracking-wider">Total de Alunos</p>
+
+<p class="text-2xl font-bold font-display">1,248</p>
+
+</div>
+
+</div>
+
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#e8f1f2] dark:border-[#444] flex items-center gap-4">
+
+<div class="p-3 bg-purple-100 text-purple-600 rounded-lg">
+
+<span class="material-symbols-outlined">schedule</span>
+
+</div>
+
+<div>
+
+<p class="text-xs text-text-secondary font-medium uppercase tracking-wider">Horas Ensinadas</p>
+
+<p class="text-2xl font-bold font-display">86.5</p>
+
+</div>
+
+</div>
+
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#e8f1f2] dark:border-[#444] flex items-center gap-4">
+
+<div class="p-3 bg-green-100 text-green-600 rounded-lg">
+
+<span class="material-symbols-outlined">trending_up</span>
+
+</div>
+
+<div>
+
+<p class="text-xs text-text-secondary font-medium uppercase tracking-wider">Taxa de Engajamento</p>
+
+<p class="text-2xl font-bold font-display">92%</p>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+</main>
+
+<div class="fixed bottom-8 right-8 z-50">
+
+<button class="bg-primary hover:bg-primary-dark text-white rounded-full p-4 shadow-lg shadow-primary/30 transition-transform hover:scale-110 active:scale-95 flex items-center justify-center">
+
+<span class="material-symbols-outlined text-[28px]">smart_toy</span>
+
+</button>
+
+</div>
+
+</body></html>

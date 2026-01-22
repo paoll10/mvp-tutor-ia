@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+
+<meta charset="utf-8"/>
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
+<title>Gestão do Curso - Mentor (PT-BR)</title>
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<script id="tailwind-config">
+
+        tailwind.config = {
+
+            darkMode: "class",
+
+            theme: {
+
+                extend: {
+
+                    colors: {
+
+                        "primary": "#15737f",
+
+                        "background-light": "#f4f9fb",
+
+                        "background-dark": "#2a2c2d",
+
+                        "surface-light": "#ffffff",
+
+                        "surface-dark": "#37393a",
+
+                        "text-main": "#0e191a",
+
+                        "text-secondary": "#518c94",
+
+                        "status-success": "#7BC079",
+
+                        "status-error": "#FF6B6B",
+
+                        "status-processing": "#F59E0B",
+
+                    },
+
+                    fontFamily: {
+
+                        "display": ["Epilogue", "sans-serif"],
+
+                        "body": ["Manrope", "sans-serif"],
+
+                    },
+
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+
+                },
+
+            },
+
+        }
+
+    </script>
+
+<style>::-webkit-scrollbar {
+
+            width: 8px;
+
+            height: 8px;
+
+        }
+
+        ::-webkit-scrollbar-track {
+
+            background: transparent;
+
+        }
+
+        ::-webkit-scrollbar-thumb {
+
+            background: #cbd5e1;
+
+            border-radius: 4px;
+
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+
+            background: #94a3b8;
+
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+
+            background: #4b5563;
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-display antialiased overflow-hidden">
+
+<div class="flex h-screen w-full">
+
+<aside class="w-72 h-full flex flex-col border-r border-gray-200 dark:border-gray-700 bg-background-light dark:bg-surface-dark transition-colors duration-300 flex-shrink-0">
+
+<div class="p-6 pb-2">
+
+<div class="flex gap-4 items-center mb-8">
+
+<div class="bg-center bg-no-repeat bg-cover rounded-xl size-12 shadow-sm border border-gray-100 dark:border-gray-600" data-alt="Abstract geometric pattern representing data structures" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA6b_lBEEHU6_o_r92dQU22TvJfsodCNjFFXE8jm8npJQmMs1qhjERX--0cyp7yax3HjR6-1dEww_Y48RrrdztYv1nC0ShOhFWAoCsVw1wIW7vcaLYQHSqWuK-BhNnb3GXd0_6QYvGMEupN63oaxjce11bsm261iy0iANhR_DTKEAygK9uIDHoX--ECqZV7LlpyB7FDf_KTSqXLvEFFWHE9Q3VUnW4zUi6nhIU7UoShEIZ7meR8Mz4_yBlQOq1-jtPJ-Sk0M3J4dvc");'>
+
+</div>
+
+<div class="flex flex-col">
+
+<h1 class="text-text-main dark:text-white text-base font-bold leading-tight">Estruturas de Dados Av.</h1>
+
+<p class="text-text-secondary dark:text-gray-400 text-xs font-medium uppercase tracking-wider mt-0.5">Outono 2024</p>
+
+</div>
+
+</div>
+
+<nav class="flex flex-col gap-1">
+
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-main dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+
+<span class="material-symbols-outlined text-[22px] text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">grid_view</span>
+
+<span class="text-sm font-medium">Visão Geral</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-main dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+
+<span class="material-symbols-outlined text-[22px] text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">group</span>
+
+<span class="text-sm font-medium">Alunos</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-300 font-semibold border-l-4 border-primary" href="#">
+
+<span class="material-symbols-outlined text-[22px] font-variation-settings-'FILL'1">folder_open</span>
+
+<span class="text-sm">Materiais</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-main dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+
+<span class="material-symbols-outlined text-[22px] text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">chat_bubble_outline</span>
+
+<span class="text-sm font-medium">Chat</span>
+
+</a>
+
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-text-main dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group" href="#">
+
+<span class="material-symbols-outlined text-[22px] text-gray-500 dark:text-gray-400 group-hover:text-primary transition-colors">settings</span>
+
+<span class="text-sm font-medium">Configurações</span>
+
+</a>
+
+</nav>
+
+</div>
+
+<div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-700">
+
+<div class="flex items-center gap-3">
+
+<div class="size-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+
+                        JD
+
+                    </div>
+
+<div class="flex flex-col">
+
+<span class="text-sm font-bold text-text-main dark:text-white">Jane Doe</span>
+
+<span class="text-xs text-text-secondary dark:text-gray-400">Mentor Líder</span>
+
+</div>
+
+</div>
+
+</div>
+
+</aside>
+
+<main class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
+
+<header class="sticky top-0 z-20 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm px-8 pt-8 pb-4">
+
+<div class="max-w-6xl mx-auto w-full">
+
+<nav class="flex items-center gap-2 text-sm mb-4 font-body">
+
+<a class="text-text-secondary dark:text-gray-400 hover:text-primary transition-colors" href="#">Painel</a>
+
+<span class="text-gray-300 dark:text-gray-600">/</span>
+
+<a class="text-text-secondary dark:text-gray-400 hover:text-primary transition-colors" href="#">Estruturas de Dados Avançadas</a>
+
+<span class="text-gray-300 dark:text-gray-600">/</span>
+
+<span class="text-text-main dark:text-white font-medium">Gestão</span>
+
+</nav>
+
+<div class="flex items-center justify-between">
+
+<h1 class="text-3xl font-black tracking-tight text-text-main dark:text-white">Gestão do Curso</h1>
+
+<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary transition-colors">
+
+<span class="material-symbols-outlined">help</span>
+
+</button>
+
+</div>
+
+</div>
+
+</header>
+
+<div class="px-8 pb-12 flex-1">
+
+<div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+<div class="lg:col-span-4 lg:order-2 space-y-6">
+
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-32">
+
+<div class="flex items-center gap-3 mb-4">
+
+<div class="bg-primary/10 p-2 rounded-lg">
+
+<span class="material-symbols-outlined text-primary">person_add</span>
+
+</div>
+
+<h2 class="text-lg font-bold">Convidar Alunos</h2>
+
+</div>
+
+<p class="text-sm text-gray-500 dark:text-gray-400 font-body mb-6 leading-relaxed">
+
+                                Compartilhe este código único ou link para permitir que os alunos se inscrevam nesta seção do curso.
+
+                            </p>
+
+<div class="bg-background-light dark:bg-background-dark rounded-lg p-4 text-center mb-6 border border-dashed border-gray-300 dark:border-gray-600">
+
+<span class="block text-xs uppercase tracking-widest text-gray-400 font-bold mb-1">Código da Turma</span>
+
+<span class="text-3xl font-black text-text-main dark:text-white tracking-wider font-mono">X79-B22</span>
+
+</div>
+
+<div class="space-y-3">
+
+<div>
+
+<label class="sr-only">Link de Convite</label>
+
+<div class="relative">
+
+<input class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg py-2.5 pl-3 pr-10 text-sm font-mono text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50" readonly="" type="text" value="platform.edu/join/X79-B22"/>
+
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80 p-1">
+
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+
+</button>
+
+</div>
+
+</div>
+
+<button class="w-full py-2.5 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm shadow-primary/20">
+
+<span>Enviar Convites por E-mail</span>
+
+</button>
+
+<div class="text-center pt-2">
+
+<button class="text-xs text-text-secondary hover:text-primary font-medium underline decoration-dashed underline-offset-4">Gerar Novo Código</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+
+<h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4">Uso de Armazenamento</h3>
+
+<div class="flex items-end gap-2 mb-2">
+
+<span class="text-2xl font-bold text-text-main dark:text-white">1.2 GB</span>
+
+<span class="text-sm text-gray-500 mb-1">/ 5.0 GB</span>
+
+</div>
+
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+
+<div class="bg-primary h-full rounded-full" style="width: 24%"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="lg:col-span-8 lg:order-1 flex flex-col gap-6">
+
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
+
+<div class="flex justify-between items-center mb-6">
+
+<h2 class="text-xl font-bold text-text-main dark:text-white">Materiais do Curso</h2>
+
+<button class="text-sm font-bold text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-lg transition-colors">
+
+                                    + Nova Pasta
+
+                                </button>
+
+</div>
+
+<div class="group relative w-full h-48 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary hover:bg-background-light dark:hover:bg-gray-800 transition-all cursor-pointer flex flex-col items-center justify-center gap-3">
+
+<div class="size-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+
+<span class="material-symbols-outlined text-gray-400 group-hover:text-primary text-2xl">cloud_upload</span>
+
+</div>
+
+<div class="text-center">
+
+<p class="text-text-main dark:text-white font-medium">Solte arquivos PDF aqui ou <span class="text-primary underline">Navegar</span></p>
+
+<p class="text-xs text-gray-400 mt-1 font-body">Suporta PDF, DOCX, PPTX (Máx 50MB)</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+
+<div class="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
+
+<h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">Arquivos Enviados</h3>
+
+<div class="flex gap-2">
+
+<button class="p-1 text-gray-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">filter_list</span></button>
+
+<button class="p-1 text-gray-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">sort</span></button>
+
+</div>
+
+</div>
+
+<ul class="divide-y divide-gray-100 dark:divide-gray-700">
+
+<li class="group flex items-center gap-4 p-4 hover:bg-background-light dark:hover:bg-gray-800 transition-colors">
+
+<div class="size-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 flex-shrink-0">
+
+<span class="material-symbols-outlined text-[24px]">picture_as_pdf</span>
+
+</div>
+
+<div class="flex-1 min-w-0">
+
+<h4 class="text-sm font-bold text-text-main dark:text-white truncate">Syllabus_Fall_2024.pdf</h4>
+
+<p class="text-xs text-gray-500 font-body">1.2 MB • Enviado há 2 dias</p>
+
+</div>
+
+<div class="flex items-center gap-4">
+
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#7BC079]/10 text-[#7BC079]">
+
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+
+                                            Pronto
+
+                                        </span>
+
+<div class="flex opacity-0 group-hover:opacity-100 transition-opacity gap-1">
+
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+
+</div>
+
+</div>
+
+</li>
+
+<li class="group flex items-center gap-4 p-4 hover:bg-background-light dark:hover:bg-gray-800 transition-colors">
+
+<div class="size-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 flex-shrink-0">
+
+<span class="material-symbols-outlined text-[24px]">picture_as_pdf</span>
+
+</div>
+
+<div class="flex-1 min-w-0">
+
+<h4 class="text-sm font-bold text-text-main dark:text-white truncate">Week_1_Introduction_to_Arrays.pdf</h4>
+
+<p class="text-xs text-gray-500 font-body">4.5 MB • Enviado ontem</p>
+
+</div>
+
+<div class="flex items-center gap-4">
+
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#7BC079]/10 text-[#7BC079]">
+
+<span class="material-symbols-outlined text-[14px] font-bold">check</span>
+
+                                            Pronto
+
+                                        </span>
+
+<div class="flex opacity-0 group-hover:opacity-100 transition-opacity gap-1">
+
+<button class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded"><span class="material-symbols-outlined text-[20px]">visibility</span></button>
+
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+
+</div>
+
+</div>
+
+</li>
+
+<li class="group flex items-center gap-4 p-4 bg-yellow-50/30 dark:bg-yellow-900/5 transition-colors">
+
+<div class="size-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400 flex-shrink-0">
+
+<span class="material-symbols-outlined text-[24px] animate-pulse">hourglass_top</span>
+
+</div>
+
+<div class="flex-1 min-w-0">
+
+<h4 class="text-sm font-bold text-text-main dark:text-white truncate">Week_2_Readings_Advanced.pdf</h4>
+
+<div class="w-full max-w-[200px] h-1 bg-gray-200 dark:bg-gray-600 rounded-full mt-2 overflow-hidden">
+
+<div class="h-full bg-status-processing w-[60%] rounded-full animate-[shimmer_1.5s_infinite] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent)]"></div>
+
+</div>
+
+</div>
+
+<div class="flex items-center gap-4">
+
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+
+<span class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>
+
+                                            Processando
+
+                                        </span>
+
+<div class="flex w-[72px] justify-end">
+
+</div>
+
+</div>
+
+</li>
+
+<li class="group flex items-center gap-4 p-4 hover:bg-background-light dark:hover:bg-gray-800 transition-colors">
+
+<div class="size-10 rounded-lg bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-status-error flex-shrink-0">
+
+<span class="material-symbols-outlined text-[24px]">broken_image</span>
+
+</div>
+
+<div class="flex-1 min-w-0">
+
+<h4 class="text-sm font-bold text-gray-400 dark:text-gray-500 truncate line-through decoration-status-error">Lecture_Notes_Raw_Scan.pdf</h4>
+
+<p class="text-xs text-status-error font-bold mt-0.5">O tamanho do arquivo excede o limite (50MB)</p>
+
+</div>
+
+<div class="flex items-center gap-4">
+
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FF6B6B]/10 text-[#FF6B6B]">
+
+<span class="material-symbols-outlined text-[14px]">error</span>
+
+                                            Erro
+
+                                        </span>
+
+<div class="flex gap-1">
+
+<button class="px-3 py-1.5 text-xs font-bold bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded text-text-main dark:text-gray-200">Tentar Novamente</button>
+
+<button class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"><span class="material-symbols-outlined text-[20px]">close</span></button>
+
+</div>
+
+</div>
+
+</li>
+
+</ul>
+
+<div class="p-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 flex justify-center">
+
+<button class="text-xs font-bold text-text-secondary hover:text-primary transition-colors flex items-center gap-1">
+
+                                    Ver Todos os Arquivos <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+</body></html>
