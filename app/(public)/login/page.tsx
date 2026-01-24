@@ -93,8 +93,9 @@ export default function LoginPage() {
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
-              // Login bem-sucedido!
-              router.push('/student/history');
+              // Login bem-sucedido! Redireciona para raiz
+              // O middleware vai verificar se tem profile e redirecionar corretamente
+              router.push('/');
             } else {
               setIsLoading(false);
             }

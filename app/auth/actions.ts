@@ -25,7 +25,8 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/student/history') // Default redirect, can be adjusted based on role later
+  // Redireciona para raiz - o middleware vai verificar profile e redirecionar corretamente
+  redirect('/')
 }
 
 export async function signup(formData: FormData) {

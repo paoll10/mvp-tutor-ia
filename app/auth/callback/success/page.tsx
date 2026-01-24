@@ -14,8 +14,9 @@ export default function OAuthSuccessPage() {
       // Fecha o popup - a janela pai vai detectar e redirecionar
       window.close();
     } else {
-      // Se não for popup, redireciona normalmente
-      router.push('/student/history');
+      // Se não for popup, redireciona para a raiz
+      // O middleware vai verificar se tem profile e redirecionar corretamente
+      router.push('/');
     }
   }, [router]);
 
