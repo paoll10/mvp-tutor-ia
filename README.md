@@ -1,36 +1,284 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 MentorIA - Tutor 24h com RAG
 
-## Getting Started
+Um tutor inteligente 24 horas que responde dúvidas dos alunos usando **exclusivamente o material do professor/mentor**, com respostas citando a fonte (trechos/páginas).
 
-First, run the development server:
+> **"ChatGPT do Professor"** - Uma base privada de conhecimento para cada curso.
+
+---
+
+## 📋 Índice
+
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Pré-requisitos](#-pré-requisitos)
+- [Instalação](#-instalação)
+- [Configuração do Banco](#-configuração-do-banco)
+- [Variáveis de Ambiente](#-variáveis-de-ambiente)
+- [Executando o Projeto](#-executando-o-projeto)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Perfis de Usuário](#-perfis-de-usuário)
+- [Fluxo do Sistema](#-fluxo-do-sistema)
+
+---
+
+## 🎯 Sobre o Projeto
+
+O **MentorIA** é um MVP de tutor inteligente que permite:
+
+- **Mentores/Professores** criarem cursos e enviarem materiais (PDFs)
+- **Alunos** entrarem em cursos via código de convite
+- **Chat com IA** que responde baseado APENAS no material do curso
+- **Citações de fontes** mostrando de onde veio cada resposta
+
+### O que NÃO é (escopo do MVP):
+- ❌ Plataforma completa de EAD
+- ❌ Gamificação (pontos, badges, ranking)
+- ❌ Provas, certificados, vídeo-aulas
+- ❌ Dashboard avançado de analytics
+
+---
+
+## ✨ Funcionalidades
+
+### Para Mentores/Professores
+- ✅ Criar cursos com código de convite
+- ✅ Upload de materiais (PDFs)
+- ✅ Visualizar status de processamento dos materiais
+- ✅ Ver perguntas dos alunos
+
+### Para Alunos
+- ✅ Entrar em cursos via código de convite
+- ✅ Chat 24h com tutor IA
+- ✅ Respostas com citações/fontes do material
+- ✅ Histórico de conversas
+
+---
+
+## 🛠 Stack Tecnológico
+
+| Tecnologia | Função |
+|------------|--------|
+| **Next.js 16** | Framework React (App Router) |
+| **TypeScript** | Tipagem estática |
+| **Tailwind CSS 4** | Estilização |
+| **Supabase** | Auth + Banco de Dados (Postgres) |
+| **Google File Search** | RAG (busca inteligente nos PDFs) |
+
+---
+
+## 📦 Pré-requisitos
+
+- **Node.js** 18+ 
+- **npm** ou **yarn**
+- Conta no **Supabase** (gratuito)
+- Conta no **Google Cloud** (para File Search)
+
+---
+
+## 🚀 Instalação
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/fabrica-de-produtos/mvp-tutor-ia.git
+cd mvp-tutor-ia
+```
+
+### 2. Instale as dependências
+
+```bash
+npm install
+```
+
+### 3. Configure as variáveis de ambiente
+
+Crie um arquivo `.env.local` na raiz do projeto:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key-aqui
+
+# Google File Search (para RAG)
+GOOGLE_FILESEARCH_API_KEY=sua-api-key
+GOOGLE_FILESEARCH_PROJECT_ID=seu-project-id
+```
+
+---
+
+## 🗄 Configuração do Banco
+
+O projeto usa o **Supabase** com um schema customizado chamado `mentoria`.
+
+### Executar Migrações
+
+As migrações estão na pasta `migrations/`. Execute-as **na ordem** no SQL Editor do Supabase:
+
+| Ordem | Arquivo | Descrição |
+|-------|---------|-----------|
+| 1️⃣ | `001_create_schema.sql` | Cria schema + permissões |
+| 2️⃣ | `002_create_profiles.sql` | Tabela de perfis |
+| 3️⃣ | `003_create_courses.sql` | Tabela de cursos |
+| 4️⃣ | `004_create_course_members.sql` | Membros dos cursos |
+| 5️⃣ | `005_create_materials.sql` | Materiais (PDFs) |
+| 6️⃣ | `006_create_conversations_messages.sql` | Chat |
+| 7️⃣ | `007_enable_rls.sql` | Ativa segurança |
+| 8️⃣ | `008_rls_policies.sql` | Políticas de acesso |
+
+> 📖 Veja instruções detalhadas em [`migrations/README.md`](./migrations/README.md)
+
+### Configurar Google OAuth (Login com Google)
+
+1. Acesse [Google Cloud Console](https://console.cloud.google.com/)
+2. Crie credenciais OAuth 2.0
+3. No Supabase Dashboard → Authentication → Providers → Google
+4. Adicione o Client ID e Client Secret
+
+---
+
+## ⚙️ Variáveis de Ambiente
+
+| Variável | Descrição | Obrigatório |
+|----------|-----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase | ✅ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave anônima do Supabase | ✅ |
+| `GOOGLE_FILESEARCH_API_KEY` | API Key do Google | ⬜ (para RAG) |
+| `GOOGLE_FILESEARCH_PROJECT_ID` | Project ID do Google | ⬜ (para RAG) |
+
+---
+
+## 🏃 Executando o Projeto
+
+### Desenvolvimento
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Produção
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+### Scripts Disponíveis
 
-To learn more about Next.js, take a look at the following resources:
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm start` | Inicia servidor de produção |
+| `npm run lint` | Verifica erros de lint |
+| `npm run test:google` | Testa configuração do Google OAuth |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Estrutura do Projeto
 
-## Deploy on Vercel
+```
+mvp-tutor-ia/
+├── app/                          # App Router (Next.js)
+│   ├── (auth)/                   # Rotas de autenticação
+│   ├── (mentor-global)/          # Layout do mentor
+│   ├── (onboarding)/             # Seleção de perfil
+│   ├── (public)/                 # Páginas públicas (login)
+│   ├── (student)/                # Layout do aluno
+│   └── auth/                     # Callbacks de auth
+├── components/                   # Componentes reutilizáveis
+├── docs/                         # Documentação
+├── migrations/                   # Migrações SQL do Supabase
+├── scripts/                      # Scripts utilitários
+├── server/                       # Server Actions
+├── utils/                        # Utilitários
+│   └── supabase/                 # Clientes Supabase
+└── proxy.ts                      # Middleware (proxy)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 👥 Perfis de Usuário
+
+### Mentor / Professor
+- Cria cursos
+- Envia materiais (PDFs)
+- Gera códigos de convite
+- Visualiza perguntas dos alunos
+
+### Aluno
+- Entra em cursos via código
+- Faz perguntas no chat
+- Recebe respostas com fontes
+- Acessa histórico de conversas
+
+---
+
+## 🔄 Fluxo do Sistema
+
+```
+┌─────────────┐     ┌───────────────┐     ┌──────────────────┐
+│   Login     │────►│ Tem profile?  │─NO─►│   Onboarding     │
+│  (Google)   │     │               │     │ "Mentor ou Aluno"│
+└─────────────┘     └───────┬───────┘     └────────┬─────────┘
+                            │ YES                   │
+                            ▼                       ▼
+                    ┌───────────────┐       ┌──────────────────┐
+                    │   Dashboard   │◄──────│  Cria Profile    │
+                    │ (por role)    │       │  e Redireciona   │
+                    └───────────────┘       └──────────────────┘
+```
+
+### Fluxo do Chat (RAG)
+
+```
+Aluno pergunta
+      │
+      ▼
+┌─────────────────┐
+│ Busca no Google │
+│  File Search    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Monta contexto  │
+│ com os trechos  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  LLM responde   │
+│  com base nos   │
+│    trechos      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Retorna resposta│
+│   + fontes      │
+└─────────────────┘
+```
+
+---
+
+## 📄 Licença
+
+Este projeto é privado e pertence à **Fábrica de Produtos**.
+
+---
+
+## 🤝 Contribuição
+
+1. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+2. Commit suas mudanças: `git commit -m 'feat: adiciona nova funcionalidade'`
+3. Push para a branch: `git push origin feature/nova-funcionalidade`
+4. Abra um Pull Request
+
+---
+
+## 📞 Suporte
+
+Para dúvidas ou problemas, entre em contato com a equipe de desenvolvimento.
