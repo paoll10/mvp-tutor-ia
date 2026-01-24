@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
             <div className="flex items-center justify-center size-8 rounded-lg bg-primary/10 dark:bg-white/10 text-primary dark:text-white">
               <span className="material-symbols-outlined text-[20px]">school</span>
             </div>
-            <h2 className="text-xl font-bold leading-tight tracking-tight text-text-main dark:text-white font-display">EduPlatform</h2>
+            <h2 className="text-xl font-bold leading-tight tracking-tight text-text-main dark:text-white font-display">MentorIA</h2>
           </div>
         </div>
       </header>

@@ -15,8 +15,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "EduPlatform",
-  description: "AI Tutor MVP",
+  title: "MentorIA",
+  description: "Plataforma de Ensino com IA",
 };
 
 export default function RootLayout({

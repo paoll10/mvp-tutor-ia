@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { login, signup, signInWithGoogle } from '@/app/auth/actions';
+import { useRouter } from 'next/navigation';
+import { login, signup } from '@/app/auth/actions';
+import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
   const [role, setRole] = useState<'student' | 'mentor'>('student');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,10 +36,90 @@ export default function LoginPage() {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
+  // Função para abrir login com Google em popup
+  const handleGoogleLogin = useCallback(async () => {
     setIsLoading(true);
-    await signInWithGoogle();
-  };
+    setMessage(null);
+
+    const supabase = createClient();
+    
+    // Gera a URL de OAuth
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        skipBrowserRedirect: true, // Não redireciona automaticamente
+        queryParams: {
+          prompt: 'consent',        // Força a tela de autorização sempre
+          access_type: 'offline',   // Solicita refresh token
+        },
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setIsLoading(false);
+      return;
+    }
+
+    if (data.url) {
+      // Configurações do popup
+      const width = 500;
+      const height = 600;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      // Abre o popup
+      const popup = window.open(
+        data.url,
+        'google-oauth-popup',
+        `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+      );
+
+      if (!popup) {
+        setMessage('Popup bloqueado! Por favor, permita popups para este site.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Monitora o popup
+      const checkPopup = setInterval(async () => {
+        try {
+          // Verifica se o popup foi fechado
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            
+            // Verifica se o usuário está autenticado
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+              // Login bem-sucedido!
+              router.push('/student/history');
+            } else {
+              setIsLoading(false);
+            }
+            return;
+          }
+
+          // Tenta verificar a URL do popup (só funciona se for do mesmo domínio)
+          if (popup.location.href.includes('/auth/callback')) {
+            popup.close();
+          }
+        } catch {
+          // Erro de cross-origin é esperado enquanto estiver no Google
+        }
+      }, 500);
+
+      // Timeout de segurança (5 minutos)
+      setTimeout(() => {
+        clearInterval(checkPopup);
+        if (!popup.closed) {
+          popup.close();
+        }
+        setIsLoading(false);
+      }, 300000);
+    }
+  }, [router]);
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300">
@@ -46,7 +129,7 @@ export default function LoginPage() {
             <div className="flex items-center justify-center size-8 rounded-lg bg-primary/10 dark:bg-white/10 text-primary dark:text-white">
               <span className="material-symbols-outlined text-[20px]">school</span>
             </div>
-            <h2 className="text-xl font-bold leading-tight tracking-tight text-text-main dark:text-white font-display">EduPlatform</h2>
+            <h2 className="text-xl font-bold leading-tight tracking-tight text-text-main dark:text-white font-display">MentorIA</h2>
           </div>
           <div className="hidden sm:flex items-center gap-6">
             <Link className="text-text-main dark:text-white/80 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors" href="#">Início</Link>
@@ -179,7 +262,7 @@ export default function LoginPage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-text-muted/60 dark:text-gray-500">
-        <p>© 2024 EduPlatform. Todos os direitos reservados.</p>
+        <p>© 2024 MentorIA. Todos os direitos reservados.</p>
         <div className="flex justify-center gap-4 mt-2">
           <Link className="hover:text-text-main dark:hover:text-gray-300" href="#">Política de Privacidade</Link>
           <Link className="hover:text-text-main dark:hover:text-gray-300" href="#">Termos de Serviço</Link>

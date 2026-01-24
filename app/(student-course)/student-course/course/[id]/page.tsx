@@ -10,7 +10,7 @@ export default function StudentCourseChatPage() {
           </button>
           <div className="flex flex-col">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              Tutor IA
+              MentorIA
               <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold uppercase tracking-wide border border-green-200 dark:border-green-800">Ativo</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoutButton from '@/components/LogoutButton';
 
 export default function MentorGlobalLayout({
   children,
@@ -14,7 +15,7 @@ export default function MentorGlobalLayout({
               <span className="material-symbols-outlined fill">school</span>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-text-main dark:text-white text-lg font-bold leading-none tracking-tight">EduPlatform</h1>
+              <h1 className="text-text-main dark:text-white text-lg font-bold leading-none tracking-tight">MentorIA</h1>
               <p className="text-text-secondary text-xs font-medium mt-1">Painel do Mentor</p>
             </div>
           </div>
@@ -42,6 +43,7 @@ export default function MentorGlobalLayout({
             <span className="material-symbols-outlined">settings</span>
             <span className="text-sm font-medium">Configurações</span>
           </Link>
+          <LogoutButton variant="menu" />
           <div className="pt-4 border-t border-[#e8f1f2] dark:border-[#444]">
             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#e8f1f2] dark:hover:bg-[#444] cursor-pointer transition-colors">
               <div className="size-10 rounded-full bg-cover bg-center border border-gray-200" data-alt="Portrait of a user" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQXRAyfhnnvFUTmzkIRu-VV8benrw5RKQesP1DZggJnEDZY04yDKNn8mnrY42hH90LXYYzPxQM_zHU53jP0q41c_Pl5EZ76npdQpSfupwqIcXczHgDoTImYycMpjFCUd-v7JVwUTVDk31087QuA7CO1mcZlXgichJy6CSKi8ZkgLx2Yc571l8TAFH4CA3HETuOr3X8tBy_YZfvw8sHO222Z_sylF50I-jTtHBOVOsUo45VAJkr_5Rf1urNkcRP90nTyxWIJQm1-yk")' }}></div>

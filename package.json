@@ -1,12 +1,13 @@
 {
-  "name": "mvp-tutor-ia",
+  "name": "mentoria",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:google": "node scripts/test-google-login.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

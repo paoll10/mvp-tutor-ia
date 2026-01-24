@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoutButton from '@/components/LogoutButton';
 
 export default function StudentCourseLayout({
   children,
@@ -31,7 +32,8 @@ export default function StudentCourseLayout({
             <span className="text-[10px] font-medium">Social</span>
           </Link>
         </div>
-        <div className="mt-auto flex flex-col gap-4">
+        <div className="mt-auto flex flex-col gap-4 items-center">
+          <LogoutButton variant="icon" />
           <div className="w-10 h-10 rounded-full bg-cover bg-center border-2 border-white dark:border-slate-600 shadow-sm cursor-pointer" data-alt="User profile picture of a student" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCp54NbzdcjJNox-T2_i5AuLxAnDfk_D_vFalH4RsdkbrBbCvDBDi307CLxXhBxkQIgj1f6SqFjD1mCXUDgpJ7PIP40qPlfpaFYvAKcwRSUoul02Yc1XO3HqxiJ_7pBK7DpIRKQVgtp7V3pu0KUH1wHv7-_qE1S4Rw8yVPEpeFWSnTi7i2zxbIaBUiB4GqR_Z5OjPJpU8s6jEWD-VLjoh1RXYoA7QxMySJBldMFbtSsfcV9bIJ5-PGOYa9VNHKpLN2eXhaFSqE8WvY")' }}></div>
         </div>
       </nav>
@@ -70,7 +72,7 @@ export default function StudentCourseLayout({
               <span className="material-symbols-outlined text-[18px]">smart_toy</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-slate-900 dark:text-white">Tutor IA</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-white">MentorIA</span>
               <span className="text-[11px] text-primary dark:text-primary-300 font-medium">Online • Contexto: Mód 2</span>
             </div>
           </Link>

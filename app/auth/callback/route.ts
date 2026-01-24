@@ -25,9 +25,25 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      return NextResponse.redirect(new URL(next, request.url))
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error && data) {
+      // Log dos dados retornados pelo Google OAuth
+      console.log('\n' + '='.repeat(60))
+      console.log('📧 DADOS DO LOGIN COM GOOGLE (OAuth)')
+      console.log('='.repeat(60))
+      console.log('\n🔐 SESSION:')
+      console.log(JSON.stringify(data.session, null, 2))
+      console.log('\n👤 USER:')
+      console.log(JSON.stringify(data.user, null, 2))
+      console.log('\n📋 USER METADATA (dados do Google):')
+      console.log(JSON.stringify(data.user?.user_metadata, null, 2))
+      console.log('\n🆔 IDENTITIES (provedores vinculados):')
+      console.log(JSON.stringify(data.user?.identities, null, 2))
+      console.log('='.repeat(60) + '\n')
+      
+      // Redireciona para página que fecha o popup
+      return NextResponse.redirect(new URL('/auth/callback/success', request.url))
     }
   }
 

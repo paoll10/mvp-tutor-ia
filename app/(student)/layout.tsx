@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import LogoutButton from '@/components/LogoutButton';
 
 export default function StudentLayout({
   children,
@@ -14,7 +15,7 @@ export default function StudentLayout({
               <span className="material-symbols-outlined text-primary text-3xl">school</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold leading-tight text-slate-900 dark:text-white">EduPlatform</h1>
+              <h1 className="text-lg font-bold leading-tight text-slate-900 dark:text-white">MentorIA</h1>
               <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Portal do Aluno</p>
             </div>
           </div>
@@ -39,6 +40,7 @@ export default function StudentLayout({
               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">settings</span>
               <span className="text-sm font-medium">Configurações</span>
             </Link>
+            <LogoutButton variant="menu" />
           </nav>
         </div>
         <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700">
