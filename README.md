@@ -289,6 +289,21 @@ Aluno pergunta
 
 ## 📝 Changelog
 
+### v0.3.1 (2026-01-31) - Correções e Gestão de Curso
+
+#### 🐛 Correções
+- **pageSize**: Corrigido limite de 100 para 20 (API File Search)
+- **Polling**: Agora só roda quando há materiais em processamento
+
+#### ✅ Melhorias
+- **Página de Gestão do Curso**: Agora usa dados reais do banco
+  - Exibe nome, descrição e status do curso
+  - Lista materiais com status real
+  - Upload de PDFs funcional
+  - Código de convite visível apenas se publicado
+
+---
+
 ### v0.3.0 (2026-01-31) - Módulo de Cursos
 
 #### ✅ Novas Funcionalidades
