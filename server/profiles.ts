@@ -93,7 +93,7 @@ export async function createProfile(formData: FormData) {
   if (role === 'mentor') {
     redirect('/mentor/dashboard')
   } else {
-    redirect('/student/history')
+    redirect('/student/dashboard')
   }
 }
 
@@ -111,6 +111,6 @@ export async function getRedirectByRole(): Promise<string> {
     return '/mentor/dashboard'
   }
 
-  return '/student/history'
+  return '/student/dashboard'
 }
 

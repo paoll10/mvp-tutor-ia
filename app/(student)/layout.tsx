@@ -20,21 +20,13 @@ export default function StudentLayout({
             </div>
           </div>
           <nav className="flex flex-col gap-1">
-            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group" href="#">
-              <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
-              <span className="text-sm font-medium">Início</span>
+            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary dark:text-primary-light font-medium" href="/student/dashboard">
+              <span className="material-symbols-outlined fill-current">home</span>
+              <span className="text-sm">Início</span>
             </Link>
-            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group" href="#">
-              <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">menu_book</span>
-              <span className="text-sm font-medium">Cursos</span>
-            </Link>
-            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group" href="#">
-              <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">chat_bubble</span>
-              <span className="text-sm font-medium">Chat</span>
-            </Link>
-            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary dark:text-primary-light font-medium" href="/student/history">
-              <span className="material-symbols-outlined fill-current">history</span>
-              <span className="text-sm">Histórico</span>
+            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group" href="/student/history">
+              <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">history</span>
+              <span className="text-sm font-medium">Histórico</span>
             </Link>
             <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors group" href="#">
               <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">settings</span>

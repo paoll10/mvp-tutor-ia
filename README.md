@@ -289,6 +289,24 @@ Aluno pergunta
 
 ## 📝 Changelog
 
+### v0.4.0 (2026-01-31) - Fluxo do Aluno
+
+#### ✅ Novas Funcionalidades
+- **Dashboard do Aluno**: Página inicial com cursos inscritos
+- **Entrar em Curso**: Aluno insere código de convite para entrar
+- **Lista de Cursos**: Exibe cursos do aluno com link para chat
+- **Server Actions**: `joinCourseByCode`, `listStudentCourses`, `getStudentCourse`
+
+#### 📦 Arquivos Adicionados
+- `server/student-courses.ts` - Server Actions para aluno
+- `app/(student)/student/dashboard/page.tsx` - Dashboard do aluno
+
+#### 🔄 Alterações
+- Layout do aluno atualizado com novos links
+- Redirecionamento pós-login agora vai para `/student/dashboard`
+
+---
+
 ### v0.3.1 (2026-01-31) - Correções e Gestão de Curso
 
 #### 🐛 Correções
