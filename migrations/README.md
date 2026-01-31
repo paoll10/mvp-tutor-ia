@@ -112,6 +112,17 @@ Arquivo: 009_alter_courses_materials.sql
 
 ---
 
+### Passo 🔟 - Políticas RLS para Alunos
+```
+Arquivo: 010_rls_student_courses.sql
+```
+- Permite alunos buscarem cursos publicados (por invite_code)
+- Permite alunos verem, entrarem e saírem de cursos
+- Permite mentores verem membros dos seus cursos
+- **Necessário para o fluxo de entrada do aluno**
+
+---
+
 ## ✅ Checklist de Execução
 
 Marque conforme for executando:
@@ -125,6 +136,7 @@ Marque conforme for executando:
 - [ ] `007_enable_rls.sql`
 - [ ] `008_rls_policies.sql`
 - [ ] `009_alter_courses_materials.sql`
+- [ ] `010_rls_student_courses.sql`
 
 ---
 
@@ -139,8 +151,9 @@ Marque conforme for executando:
 | 005 | `005_create_materials.sql` | Tabela `materials` |
 | 006 | `006_create_conversations_messages.sql` | Tabelas `conversations` + `messages` |
 | 007 | `007_enable_rls.sql` | Ativa RLS |
-| 008 | `008_rls_policies.sql` | Políticas de segurança |
+| 008 | `008_rls_policies.sql` | Políticas de segurança (mentor) |
 | 009 | `009_alter_courses_materials.sql` | Altera `courses` + `materials` para Vertex AI |
+| 010 | `010_rls_student_courses.sql` | Políticas de segurança (aluno) |
 
 ## 🔒 Segurança (RLS)
 
