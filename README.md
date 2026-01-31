@@ -289,6 +289,21 @@ Aluno pergunta
 
 ## 📝 Changelog
 
+### v0.5.0 (2026-01-31) - Chat RAG com Gemini
+
+#### ✅ Novas Funcionalidades
+- **Chat com IA**: Interface de chat funcional para alunos
+- **Integração Gemini File Search**: RAG com materiais do curso
+- **Fontes Citadas**: Exibe documentos consultados na resposta
+- **Server Action `askQuestion`**: Envia pergunta e retorna resposta com fontes
+
+#### 📦 Arquivos Adicionados/Alterados
+- `server/chat.ts` - Server Action para chat com IA
+- `app/(student-course)/student-course/course/[id]/page.tsx` - Página de chat real
+- `app/(student-course)/layout.tsx` - Layout simplificado
+
+---
+
 ### v0.4.0 (2026-01-31) - Fluxo do Aluno
 
 #### ✅ Novas Funcionalidades
@@ -296,10 +311,12 @@ Aluno pergunta
 - **Entrar em Curso**: Aluno insere código de convite para entrar
 - **Lista de Cursos**: Exibe cursos do aluno com link para chat
 - **Server Actions**: `joinCourseByCode`, `listStudentCourses`, `getStudentCourse`
+- **Migração RLS**: Políticas para alunos acessarem cursos publicados
 
 #### 📦 Arquivos Adicionados
 - `server/student-courses.ts` - Server Actions para aluno
 - `app/(student)/student/dashboard/page.tsx` - Dashboard do aluno
+- `migrations/010_rls_student_courses.sql` - Políticas RLS para alunos
 
 #### 🔄 Alterações
 - Layout do aluno atualizado com novos links
