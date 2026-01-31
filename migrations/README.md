@@ -99,6 +99,19 @@ Arquivo: 008_rls_policies.sql
 
 ---
 
+### Passo 9️⃣ - Alterações para Fluxo de Criação de Curso
+```
+Arquivo: 009_alter_courses_materials.sql
+```
+- Adiciona `status` na tabela `courses` (`draft` | `published`)
+- Adiciona metadados na tabela `materials` para Vertex AI:
+  - `file_size_bytes`: tamanho do arquivo
+  - `mime_type`: tipo do arquivo
+  - `original_filename`: nome original
+- **Necessário para o novo fluxo de criação de curso**
+
+---
+
 ## ✅ Checklist de Execução
 
 Marque conforme for executando:
@@ -111,13 +124,14 @@ Marque conforme for executando:
 - [ ] `006_create_conversations_messages.sql`
 - [ ] `007_enable_rls.sql`
 - [ ] `008_rls_policies.sql`
+- [ ] `009_alter_courses_materials.sql`
 
 ---
 
 ## 📋 Resumo das Migrações
 
-| # | Arquivo | O que cria |
-|---|---------|------------|
+| # | Arquivo | O que cria/altera |
+|---|---------|-------------------|
 | 001 | `001_create_schema.sql` | Schema `mentoria` + permissões |
 | 002 | `002_create_profiles.sql` | Tabela `profiles` |
 | 003 | `003_create_courses.sql` | Tabela `courses` |
@@ -126,6 +140,7 @@ Marque conforme for executando:
 | 006 | `006_create_conversations_messages.sql` | Tabelas `conversations` + `messages` |
 | 007 | `007_enable_rls.sql` | Ativa RLS |
 | 008 | `008_rls_policies.sql` | Políticas de segurança |
+| 009 | `009_alter_courses_materials.sql` | Altera `courses` + `materials` para Vertex AI |
 
 ## 🔒 Segurança (RLS)
 

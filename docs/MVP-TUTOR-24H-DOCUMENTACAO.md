@@ -246,7 +246,31 @@ create index if not exists idx_materials_course_id on public.materials(course_id
 create index if not exists idx_materials_created_by on public.materials(created_by);
 ```
 
-#### 1.4 RLS (Row Level Security)
+#### 1.4 Alterações para Fluxo de Criação (Migração 009)
+
+```sql
+-- COURSES: Adicionar status para controlar fluxo de criação
+-- 'draft' = Mentor está criando/adicionando materiais
+-- 'published' = Curso finalizado, código de convite liberado
+ALTER TABLE mentoria.courses 
+ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'draft' 
+CHECK (status IN ('draft', 'published'));
+
+-- MATERIALS: Adicionar metadados para Vertex AI
+ALTER TABLE mentoria.materials 
+ADD COLUMN IF NOT EXISTS file_size_bytes bigint;
+
+ALTER TABLE mentoria.materials 
+ADD COLUMN IF NOT EXISTS mime_type text DEFAULT 'application/pdf';
+
+ALTER TABLE mentoria.materials 
+ADD COLUMN IF NOT EXISTS original_filename text;
+
+-- Índice para buscar cursos por status
+CREATE INDEX IF NOT EXISTS idx_courses_status ON mentoria.courses(status);
+```
+
+#### 1.5 RLS (Row Level Security)
 
 ```sql
 -- Ativar RLS
