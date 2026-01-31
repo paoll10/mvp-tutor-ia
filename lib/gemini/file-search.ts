@@ -123,10 +123,23 @@ export async function uploadFileToStore(
     }
 
     console.log(`Arquivo processado: ${displayName}`);
+    console.log('Operation response:', JSON.stringify(operation, null, 2));
+
+    // Tenta obter o nome do documento de várias formas
+    const documentName = 
+      operation.response?.name || 
+      operation.result?.name ||
+      // @ts-expect-error - estrutura pode variar
+      operation.response?.document?.name ||
+      // @ts-expect-error - estrutura pode variar
+      operation.metadata?.document?.name ||
+      null;
+
+    console.log(`Document name extraído: ${documentName}`);
 
     return {
       success: true,
-      documentName: operation.response?.name,
+      documentName,
     };
   } catch (error) {
     console.error('Erro ao fazer upload:', error);
