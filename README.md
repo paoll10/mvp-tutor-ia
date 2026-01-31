@@ -125,6 +125,7 @@ As migrações estão na pasta `migrations/`. Execute-as **na ordem** no SQL Edi
 | 6️⃣ | `006_create_conversations_messages.sql` | Chat |
 | 7️⃣ | `007_enable_rls.sql` | Ativa segurança |
 | 8️⃣ | `008_rls_policies.sql` | Políticas de acesso |
+| 9️⃣ | `009_alter_courses_materials.sql` | Status do curso + metadados |
 
 > 📖 Veja instruções detalhadas em [`migrations/README.md`](./migrations/README.md)
 
@@ -143,8 +144,14 @@ As migrações estão na pasta `migrations/`. Execute-as **na ordem** no SQL Edi
 |----------|-----------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase | ✅ |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave anônima do Supabase | ✅ |
-| `GOOGLE_FILESEARCH_API_KEY` | API Key do Google | ⬜ (para RAG) |
-| `GOOGLE_FILESEARCH_PROJECT_ID` | Project ID do Google | ⬜ (para RAG) |
+| `GEMINI_API_KEY` | API Key do Google AI Studio (Gemini) | ✅ |
+
+### Obter a API Key do Gemini
+
+1. Acesse [Google AI Studio](https://aistudio.google.com/)
+2. Clique em **Get API Key** 
+3. Crie uma nova chave ou copie uma existente
+4. Adicione ao `.env.local`
 
 ---
 
@@ -174,6 +181,7 @@ npm start
 | `npm start` | Inicia servidor de produção |
 | `npm run lint` | Verifica erros de lint |
 | `npm run test:google` | Testa configuração do Google OAuth |
+| `npm run check:stores` | Lista File Search Stores e documentos |
 
 ---
 
@@ -181,21 +189,36 @@ npm start
 
 ```
 mvp-tutor-ia/
-├── app/                          # App Router (Next.js)
-│   ├── (auth)/                   # Rotas de autenticação
-│   ├── (mentor-global)/          # Layout do mentor
-│   ├── (onboarding)/             # Seleção de perfil
-│   ├── (public)/                 # Páginas públicas (login)
-│   ├── (student)/                # Layout do aluno
-│   └── auth/                     # Callbacks de auth
-├── components/                   # Componentes reutilizáveis
-├── docs/                         # Documentação
-├── migrations/                   # Migrações SQL do Supabase
-├── scripts/                      # Scripts utilitários
-├── server/                       # Server Actions
-├── utils/                        # Utilitários
-│   └── supabase/                 # Clientes Supabase
-└── proxy.ts                      # Middleware (proxy)
+├── app/                              # App Router (Next.js)
+│   ├── (mentor-creation)/            # Fluxo de criação de curso
+│   │   └── mentor/courses/
+│   │       ├── create/               # Step 1: Detalhes
+│   │       └── [id]/
+│   │           ├── materials/        # Step 2: Upload PDFs
+│   │           └── complete/         # Step 3: Código
+│   ├── (mentor-global)/              # Dashboard do mentor
+│   ├── (onboarding)/                 # Seleção de perfil
+│   ├── (public)/                     # Páginas públicas (login)
+│   ├── (student)/                    # Layout do aluno
+│   ├── api/
+│   │   └── materials/upload/         # API de upload
+│   └── auth/                         # Callbacks de auth
+├── components/                       # Componentes reutilizáveis
+├── docs/                             # Documentação detalhada
+├── lib/
+│   └── gemini/                       # Integração Google AI
+│       ├── client.ts                 # Cliente GoogleGenAI
+│       └── file-search.ts            # Adapter File Search
+├── migrations/                       # Migrações SQL (001-009)
+├── scripts/                          # Scripts utilitários
+│   ├── test-google-login.js          # Testa OAuth
+│   └── check-file-search-stores.js   # Lista stores
+├── server/                           # Server Actions
+│   ├── profiles.ts                   # Gestão de perfis
+│   ├── courses.ts                    # CRUD de cursos
+│   └── materials.ts                  # Gestão de materiais
+├── utils/supabase/                   # Clientes Supabase
+└── proxy.ts                          # Middleware (proxy)
 ```
 
 ---
@@ -261,6 +284,49 @@ Aluno pergunta
 │   + fontes      │
 └─────────────────┘
 ```
+
+---
+
+## 📝 Changelog
+
+### v0.3.0 (2026-01-31) - Módulo de Cursos
+
+#### ✅ Novas Funcionalidades
+- **Criação de Cursos**: Wizard em 3 etapas (Detalhes → Materiais → Conclusão)
+- **Upload de PDFs**: Drag & drop com status em tempo real
+- **Gemini File Search**: Integração completa para RAG
+  - Chunking automático de documentos
+  - Indexação e busca semântica
+- **Dashboard do Mentor**: Lista cursos reais do banco
+- **Script de verificação**: `npm run check:stores`
+
+#### 📦 Arquivos Adicionados
+- `lib/gemini/client.ts` - Cliente GoogleGenAI
+- `lib/gemini/file-search.ts` - Adapter File Search
+- `server/courses.ts` - CRUD de cursos
+- `server/materials.ts` - Gestão de materiais
+- `app/api/materials/upload/route.ts` - API de upload
+- `scripts/check-file-search-stores.js` - Script de verificação
+
+---
+
+### v0.2.0 (2026-01-30) - Auth + Onboarding
+
+#### ✅ Novas Funcionalidades
+- Login com email/senha
+- Login com Google (OAuth em popup)
+- Recuperação de senha
+- Onboarding (seleção Mentor/Aluno)
+- Migrações do banco (001-009)
+
+---
+
+### v0.1.0 (2026-01-29) - Setup Inicial
+
+- Estrutura base do Next.js 16
+- Configuração Supabase
+- Layouts para Mentor e Aluno
+- Proxy (middleware) configurado
 
 ---
 
