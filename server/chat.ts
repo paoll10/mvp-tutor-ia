@@ -70,6 +70,13 @@ export async function askQuestion(
     throw new Error('Curso não encontrado');
   }
 
+  // Log para debug
+  console.log('[Chat] Dados do curso:', {
+    id: course.id,
+    name: course.name,
+    file_search_store_id: course.file_search_store_id || 'NÃO DEFINIDO',
+  });
+
   // Prepara a resposta
   let answer: string;
   const sources: ChatSource[] = [];
@@ -79,6 +86,8 @@ export async function askQuestion(
 
     // Se o curso tem File Search Store, usa RAG
     if (course.file_search_store_id) {
+      console.log(`[Chat] Usando File Search Store: ${course.file_search_store_id}`);
+      
       // Gera resposta com grounding no File Search Store
       const response = await client.models.generateContent({
         model: DEFAULT_MODEL,
@@ -92,21 +101,28 @@ export async function askQuestion(
           tools: [
             {
               fileSearch: {
-                fileSearchStoreIds: [course.file_search_store_id],
+                fileSearchStoreNames: [course.file_search_store_id],
               },
             },
           ],
-          systemInstruction: `Você é um tutor de IA especializado no curso "${course.name}".
+          systemInstruction: `Você é um tutor de IA que responde perguntas EXCLUSIVAMENTE com base nos documentos fornecidos através do File Search.
 
-REGRAS:
-1. Responda APENAS com base nos materiais do curso fornecidos.
-2. Se a informação não estiver nos materiais, diga que não encontrou a resposta nos materiais disponíveis.
-3. Seja didático e use exemplos quando possível.
-4. Responda sempre em português brasileiro.
-5. Mantenha as respostas concisas mas completas.
-6. Quando citar informações dos materiais, indique de qual documento veio.`,
+REGRAS OBRIGATÓRIAS:
+1. Use APENAS as informações recuperadas dos documentos do File Search para responder.
+2. NÃO invente informações. NÃO use conhecimento externo.
+3. Se o File Search não retornar informações relevantes, responda: "Não encontrei informações sobre isso nos materiais do curso."
+4. Sempre que citar informações, mencione o nome do documento de origem.
+5. Responda em português brasileiro de forma didática.
+6. O nome do curso é "${course.name}" - use isso apenas para contexto, não invente conteúdo baseado no nome.
+
+IMPORTANTE: Você deve basear sua resposta APENAS nos chunks de texto retornados pelo File Search. Se nenhum chunk relevante foi retornado, diga que não encontrou a informação.`,
         },
       });
+
+      // Log para debug
+      console.log('[Chat] Resposta recebida. Verificando grounding metadata...');
+      const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
+      console.log('[Chat] Grounding metadata:', JSON.stringify(groundingMetadata, null, 2));
 
       // Extrai o texto da resposta
       const textPart = response.candidates?.[0]?.content?.parts?.find(
@@ -115,26 +131,43 @@ REGRAS:
       answer = textPart && 'text' in textPart ? textPart.text || '' : '';
 
       // Extrai as fontes do grounding metadata
-      const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
-      
       if (groundingMetadata?.groundingChunks) {
+        console.log(`[Chat] Encontrados ${groundingMetadata.groundingChunks.length} grounding chunks`);
+        
+        // Usa um Set para evitar duplicatas de títulos
+        const seenTitles = new Set<string>();
+        
         for (const chunk of groundingMetadata.groundingChunks) {
           if (chunk.retrievedContext) {
-            sources.push({
-              title: chunk.retrievedContext.title || 'Material do curso',
-              snippet: chunk.retrievedContext.text?.substring(0, 200),
-            });
+            const title = chunk.retrievedContext.title || 'Material do curso';
+            
+            // Evita duplicar fontes com o mesmo título
+            if (!seenTitles.has(title)) {
+              seenTitles.add(title);
+              sources.push({
+                title,
+                snippet: chunk.retrievedContext.text?.substring(0, 300),
+              });
+            }
           }
         }
       }
 
-      // Se não encontrou grounding chunks, tenta outra estrutura
-      if (sources.length === 0 && groundingMetadata?.retrievalQueries) {
-        // Adiciona indicação de que usou RAG
-        sources.push({
-          title: 'Materiais do curso',
-          snippet: 'Resposta baseada nos PDFs do curso',
-        });
+      // Se não encontrou grounding chunks, verifica se há chunks em outra estrutura
+      if (sources.length === 0) {
+        console.log('[Chat] Nenhum grounding chunk encontrado.');
+        
+        // Verifica se há retrievalQueries (indica que o file search foi acionado)
+        if (groundingMetadata?.retrievalQueries) {
+          console.log('[Chat] Retrieval queries encontradas:', groundingMetadata.retrievalQueries);
+          sources.push({
+            title: 'Materiais do curso',
+            snippet: 'Busca realizada nos documentos do curso',
+          });
+        } else {
+          // Se não há nenhuma metadata de grounding, pode ser que o file search não funcionou
+          console.log('[Chat] AVISO: Nenhum metadata de grounding encontrado. O File Search pode não estar funcionando.');
+        }
       }
     } else {
       // Se não tem File Search Store, usa apenas o modelo

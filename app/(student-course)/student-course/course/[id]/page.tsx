@@ -120,9 +120,9 @@ export default function StudentCourseChatPage({ params }: PageProps) {
   }
 
   return (
-    <>
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-surface-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
+      <header className="flex-shrink-0 flex items-center justify-between px-6 py-4 bg-surface-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-3">
           <Link
             href="/student/dashboard"
@@ -146,7 +146,7 @@ export default function StudentCourseChatPage({ params }: PageProps) {
       </header>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 flex flex-col gap-6">
+      <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 md:p-8 flex flex-col gap-6">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -254,11 +254,11 @@ export default function StudentCourseChatPage({ params }: PageProps) {
           </div>
         )}
 
-        <div ref={messagesEndRef} className="h-24" />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
 
       {/* Input */}
-      <div className="absolute bottom-0 left-0 w-full px-4 md:px-8 pb-6 pt-4 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark z-10">
+      <div className="flex-shrink-0 px-4 md:px-8 pb-6 pt-4 bg-surface-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-700">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto relative">
           <div className="flex items-end gap-2 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-600 rounded-2xl shadow-float p-2 focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary transition-all">
             <textarea
@@ -292,6 +292,6 @@ export default function StudentCourseChatPage({ params }: PageProps) {
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 }
