@@ -123,6 +123,16 @@ Arquivo: 010_rls_student_courses.sql
 
 ---
 
+### Passo 1️⃣1️⃣ - Adiciona File Search Store ID
+```
+Arquivo: 011_add_file_search_store_id.sql
+```
+- Adiciona coluna `file_search_store_id` na tabela `courses`
+- Armazena o ID do File Search Store do Gemini
+- **Necessário para o Chat RAG funcionar**
+
+---
+
 ## ✅ Checklist de Execução
 
 Marque conforme for executando:
@@ -137,6 +147,7 @@ Marque conforme for executando:
 - [ ] `008_rls_policies.sql`
 - [ ] `009_alter_courses_materials.sql`
 - [ ] `010_rls_student_courses.sql`
+- [ ] `011_add_file_search_store_id.sql`
 
 ---
 
@@ -154,6 +165,7 @@ Marque conforme for executando:
 | 008 | `008_rls_policies.sql` | Políticas de segurança (mentor) |
 | 009 | `009_alter_courses_materials.sql` | Altera `courses` + `materials` para Vertex AI |
 | 010 | `010_rls_student_courses.sql` | Políticas de segurança (aluno) |
+| 011 | `011_add_file_search_store_id.sql` | Adiciona `file_search_store_id` em courses |
 
 ## 🔒 Segurança (RLS)
 

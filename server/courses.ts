@@ -91,9 +91,20 @@ export async function createCourse(formData: FormData) {
     return { error: 'Erro ao criar curso. Tente novamente.' };
   }
 
-  // Cria o File Search Store para o curso
+  // Cria o File Search Store para o curso e salva o ID
   try {
-    await getOrCreateFileSearchStore(`course-${course.id}`);
+    const store = await getOrCreateFileSearchStore(`course-${course.id}`);
+    
+    // Atualiza o curso com o ID do store
+    if (store.name) {
+      await supabase
+        .schema('mentoria')
+        .from('courses')
+        .update({ file_search_store_id: store.name })
+        .eq('id', course.id);
+      
+      console.log(`Store ${store.name} vinculado ao curso ${course.id}`);
+    }
   } catch (err) {
     console.error('Erro ao criar File Search Store:', err);
     // Não falha a criação do curso, apenas loga o erro
