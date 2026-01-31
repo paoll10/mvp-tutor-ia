@@ -8,7 +8,32 @@
  */
 
 const { GoogleGenAI } = require('@google/genai');
-require('dotenv').config({ path: '.env.local' });
+const fs = require('fs');
+const path = require('path');
+
+// Carrega variáveis do .env.local manualmente
+function loadEnvFile() {
+  const envPath = path.join(process.cwd(), '.env.local');
+  
+  if (!fs.existsSync(envPath)) {
+    console.error('❌ Arquivo .env.local não encontrado');
+    process.exit(1);
+  }
+
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  const lines = envContent.split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=');
+      const value = valueParts.join('=');
+      process.env[key] = value;
+    }
+  }
+}
+
+loadEnvFile();
 
 async function main() {
   console.log('\n🔍 Verificando File Search Stores...\n');
@@ -27,7 +52,7 @@ async function main() {
     // Lista todos os stores
     console.log('\n📦 FILE SEARCH STORES:\n');
     
-    const storesPager = await ai.fileSearchStores.list({ config: { pageSize: 100 } });
+    const storesPager = await ai.fileSearchStores.list({ config: { pageSize: 20 } });
     let storesCount = 0;
     
     for await (const store of storesPager) {

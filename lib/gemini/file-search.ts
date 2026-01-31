@@ -46,7 +46,7 @@ export async function findFileSearchStore(displayName: string): Promise<FileSear
   const client = getGeminiClient();
   
   try {
-    const pager = await client.fileSearchStores.list({ config: { pageSize: 100 } });
+    const pager = await client.fileSearchStores.list({ config: { pageSize: 20 } });
     let page = pager.page;
     
     while (true) {

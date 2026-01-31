@@ -27,13 +27,20 @@ export default function MaterialsUploadPage() {
     setMaterials(materialsData);
   }, [courseId]);
 
+  // Carrega dados inicial
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  // Polling condicional - só quando há materiais em processamento
+  useEffect(() => {
+    const hasProcessing = materials.some(m => m.status === 'processing');
     
-    // Polling para atualizar status dos materiais
+    if (!hasProcessing) return;
+
     const interval = setInterval(loadData, 5000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [materials, loadData]);
 
   // Faz upload do arquivo
   const handleUpload = async (files: FileList) => {
