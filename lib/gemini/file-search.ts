@@ -128,13 +128,19 @@ export async function uploadFileToStore(
     console.log('Operation response:', JSON.stringify(operation, null, 2));
 
     // Tenta obter o nome do documento de várias formas
+    // A estrutura da resposta pode variar entre versões da API
+    const op = operation as Record<string, unknown>;
+    const response = (op.response ?? {}) as Record<string, unknown>;
+    const result = (op.result ?? {}) as Record<string, unknown>;
+    const metadata = (op.metadata ?? {}) as Record<string, unknown>;
+    const responseDoc = (response.document ?? {}) as Record<string, unknown>;
+    const metadataDoc = (metadata.document ?? {}) as Record<string, unknown>;
+
     const documentName = 
-      operation.response?.name || 
-      operation.result?.name ||
-      // @ts-expect-error - estrutura pode variar
-      operation.response?.document?.name ||
-      // @ts-expect-error - estrutura pode variar
-      operation.metadata?.document?.name ||
+      (response.name as string) || 
+      (result.name as string) ||
+      (responseDoc.name as string) ||
+      (metadataDoc.name as string) ||
       null;
 
     console.log(`Document name extraído: ${documentName}`);
