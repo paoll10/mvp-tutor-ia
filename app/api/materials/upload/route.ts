@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadMaterial } from '@/server/materials';
 
+// Aumenta o timeout para uploads (Gemini pode demorar para processar PDFs)
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
