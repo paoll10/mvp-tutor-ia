@@ -21,7 +21,7 @@ export default function LoginPage() {
     const formData = new FormData(event.currentTarget);
     formData.append('role', role);
 
-    let result;
+    let result: { error?: string; success?: string } | undefined;
     if (mode === 'login') {
       result = await login(formData);
     } else {
