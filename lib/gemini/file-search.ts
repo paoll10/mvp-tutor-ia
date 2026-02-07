@@ -129,7 +129,7 @@ export async function uploadFileToStore(
 
     // Tenta obter o nome do documento de várias formas
     // A estrutura da resposta pode variar entre versões da API
-    const op = operation as Record<string, unknown>;
+    const op = operation as unknown as Record<string, unknown>;
     const response = (op.response ?? {}) as Record<string, unknown>;
     const result = (op.result ?? {}) as Record<string, unknown>;
     const metadata = (op.metadata ?? {}) as Record<string, unknown>;
