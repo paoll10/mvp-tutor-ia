@@ -100,9 +100,10 @@ export async function uploadFileToStore(
   const client = getGeminiClient();
 
   try {
-    // Converte Buffer para Uint8Array para compatibilidade com BlobPart
-    const uint8 = new Uint8Array(fileBuffer.buffer, fileBuffer.byteOffset, fileBuffer.byteLength);
-    const blob = new Blob([uint8], { type: 'application/pdf' });
+    // Copia Buffer para um ArrayBuffer puro (evita ArrayBufferLike do Node.js)
+    const arrayBuffer = new ArrayBuffer(fileBuffer.byteLength);
+    new Uint8Array(arrayBuffer).set(fileBuffer);
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
     
     // Cria um File object
     const file = new File([blob], fileName, { type: 'application/pdf' });
