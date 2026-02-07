@@ -2,10 +2,8 @@ import Link from 'next/link';
 
 export default function MentorCourseLayout({
   children,
-  params
 }: {
   children: React.ReactNode;
-  params: { id: string };
 }) {
   return (
     <div className="bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-display antialiased overflow-hidden h-screen flex">
