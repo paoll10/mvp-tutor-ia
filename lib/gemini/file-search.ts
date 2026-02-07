@@ -141,7 +141,7 @@ export async function uploadFileToStore(
       (result.name as string) ||
       (responseDoc.name as string) ||
       (metadataDoc.name as string) ||
-      null;
+      undefined;
 
     console.log(`Document name extraído: ${documentName}`);
 
