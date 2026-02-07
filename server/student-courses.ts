@@ -125,15 +125,10 @@ export async function listStudentCourses(): Promise<StudentCourse[]> {
 
   // Formata os dados
   return memberships.map((m) => ({
-    // @ts-expect-error - courses é um objeto aninhado
     id: m.courses.id,
-    // @ts-expect-error - courses é um objeto aninhado
     name: m.courses.name,
-    // @ts-expect-error - courses é um objeto aninhado
     description: m.courses.description,
-    // @ts-expect-error - courses é um objeto aninhado
     owner_id: m.courses.owner_id,
-    // @ts-expect-error - courses é um objeto aninhado
     created_at: m.courses.created_at,
     joined_at: m.created_at,
   }));
@@ -175,15 +170,10 @@ export async function getStudentCourse(courseId: string): Promise<StudentCourse 
   }
 
   return {
-    // @ts-expect-error - courses é um objeto aninhado
     id: membership.courses.id,
-    // @ts-expect-error - courses é um objeto aninhado
     name: membership.courses.name,
-    // @ts-expect-error - courses é um objeto aninhado
     description: membership.courses.description,
-    // @ts-expect-error - courses é um objeto aninhado
     owner_id: membership.courses.owner_id,
-    // @ts-expect-error - courses é um objeto aninhado
     created_at: membership.courses.created_at,
     joined_at: membership.created_at,
   };

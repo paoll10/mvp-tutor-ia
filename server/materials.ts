@@ -219,7 +219,6 @@ export async function deleteMaterial(materialId: string) {
   }
 
   // Verifica permissão
-  // @ts-expect-error - courses é um objeto aninhado
   if (material.courses?.owner_id !== user.id) {
     return { error: 'Você não tem permissão para deletar este material' };
   }
