@@ -124,14 +124,24 @@ export async function listStudentCourses(): Promise<StudentCourse[]> {
   }
 
   // Formata os dados
-  return memberships.map((m) => ({
-    id: m.courses.id,
-    name: m.courses.name,
-    description: m.courses.description,
-    owner_id: m.courses.owner_id,
-    created_at: m.courses.created_at,
-    joined_at: m.created_at,
-  }));
+  // O Supabase tipa joins com alias como array, mas retorna objeto em runtime
+  return memberships.map((m) => {
+    const course = m.courses as unknown as {
+      id: string;
+      name: string;
+      description: string | null;
+      owner_id: string;
+      created_at: string;
+    };
+    return {
+      id: course.id,
+      name: course.name,
+      description: course.description,
+      owner_id: course.owner_id,
+      created_at: course.created_at,
+      joined_at: m.created_at,
+    };
+  });
 }
 
 /**
@@ -169,12 +179,20 @@ export async function getStudentCourse(courseId: string): Promise<StudentCourse 
     return null;
   }
 
+  // O Supabase tipa joins com alias como array, mas retorna objeto em runtime
+  const course = membership.courses as unknown as {
+    id: string;
+    name: string;
+    description: string | null;
+    owner_id: string;
+    created_at: string;
+  };
   return {
-    id: membership.courses.id,
-    name: membership.courses.name,
-    description: membership.courses.description,
-    owner_id: membership.courses.owner_id,
-    created_at: membership.courses.created_at,
+    id: course.id,
+    name: course.name,
+    description: course.description,
+    owner_id: course.owner_id,
+    created_at: course.created_at,
     joined_at: membership.created_at,
   };
 }
