@@ -63,6 +63,7 @@ O **MentorIA** é um MVP de tutor inteligente que permite:
 | **TypeScript** | Tipagem estática |
 | **Tailwind CSS 4** | Estilização |
 | **Supabase** | Auth + Banco de Dados (Postgres) |
+| **Gemini 2.5 Flash** | Modelo de IA para respostas do tutor |
 | **Google File Search** | RAG (busca inteligente nos PDFs) |
 
 ---
@@ -100,9 +101,8 @@ Crie um arquivo `.env.local` na raiz do projeto:
 NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key-aqui
 
-# Google File Search (para RAG)
-GOOGLE_FILESEARCH_API_KEY=sua-api-key
-GOOGLE_FILESEARCH_PROJECT_ID=seu-project-id
+# Gemini AI (Google AI Studio)
+GEMINI_API_KEY=sua-api-key-do-google-ai-studio
 ```
 
 ---
@@ -126,6 +126,8 @@ As migrações estão na pasta `migrations/`. Execute-as **na ordem** no SQL Edi
 | 7️⃣ | `007_enable_rls.sql` | Ativa segurança |
 | 8️⃣ | `008_rls_policies.sql` | Políticas de acesso |
 | 9️⃣ | `009_alter_courses_materials.sql` | Status do curso + metadados |
+| 🔟 | `010_rls_student_courses.sql` | Políticas RLS para alunos |
+| 1️⃣1️⃣ | `011_add_file_search_store_id.sql` | Coluna File Search Store ID nos cursos |
 
 > 📖 Veja instruções detalhadas em [`migrations/README.md`](./migrations/README.md)
 
@@ -182,6 +184,7 @@ npm start
 | `npm run lint` | Verifica erros de lint |
 | `npm run test:google` | Testa configuração do Google OAuth |
 | `npm run check:stores` | Lista File Search Stores e documentos |
+| `npm run sync:stores` | Sincroniza File Search Store IDs com o banco |
 
 ---
 
@@ -197,9 +200,15 @@ mvp-tutor-ia/
 │   │           ├── materials/        # Step 2: Upload PDFs
 │   │           └── complete/         # Step 3: Código
 │   ├── (mentor-global)/              # Dashboard do mentor
+│   ├── (mentor-course)/              # Gestão de curso (mentor)
+│   │   └── mentor/courses/[id]/
+│   │       └── manage/              # Gerenciar curso
 │   ├── (onboarding)/                 # Seleção de perfil
 │   ├── (public)/                     # Páginas públicas (login)
-│   ├── (student)/                    # Layout do aluno
+│   ├── (student)/                    # Dashboard e layout do aluno
+│   ├── (student-course)/             # Chat do aluno com tutor IA
+│   │   └── student-course/course/
+│   │       └── [id]/                # Interface de chat RAG
 │   ├── api/
 │   │   └── materials/upload/         # API de upload
 │   └── auth/                         # Callbacks de auth
@@ -209,13 +218,17 @@ mvp-tutor-ia/
 │   └── gemini/                       # Integração Google AI
 │       ├── client.ts                 # Cliente GoogleGenAI
 │       └── file-search.ts            # Adapter File Search
-├── migrations/                       # Migrações SQL (001-009)
+├── migrations/                       # Migrações SQL (001-011)
 ├── scripts/                          # Scripts utilitários
 │   ├── test-google-login.js          # Testa OAuth
-│   └── check-file-search-stores.js   # Lista stores
+│   ├── check-file-search-stores.js   # Lista stores
+│   ├── sync-file-search-stores.js    # Sincroniza store IDs
+│   └── test-file-search-query.js     # Testa queries do File Search
 ├── server/                           # Server Actions
 │   ├── profiles.ts                   # Gestão de perfis
 │   ├── courses.ts                    # CRUD de cursos
+│   ├── chat.ts                       # Chat IA com Gemini File Search
+│   ├── student-courses.ts            # Fluxo do aluno (entrar em curso)
 │   └── materials.ts                  # Gestão de materiais
 ├── utils/supabase/                   # Clientes Supabase
 └── proxy.ts                          # Middleware (proxy)
@@ -254,40 +267,75 @@ mvp-tutor-ia/
                     └───────────────┘       └──────────────────┘
 ```
 
-### Fluxo do Chat (RAG)
+### Fluxo do Chat (RAG com Gemini File Search)
 
 ```
-Aluno pergunta
+Aluno faz pergunta
       │
       ▼
-┌─────────────────┐
-│ Busca no Google │
-│  File Search    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Monta contexto  │
-│ com os trechos  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  LLM responde   │
-│  com base nos   │
-│    trechos      │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│ Retorna resposta│
-│   + fontes      │
-└─────────────────┘
+┌──────────────────────┐
+│  Server Action       │
+│  askQuestion()       │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Gemini 2.5 Flash     │
+│ + File Search Tool   │
+│ (fileSearchStoreNames)│
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Busca semântica nos  │
+│ PDFs do curso via    │
+│ File Search Store    │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ LLM responde APENAS  │
+│ com base nos chunks  │
+│ retornados            │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ Retorna resposta     │
+│ + fontes (deduplica- │
+│   das, com snippets) │
+└──────────────────────┘
 ```
+
+> **Nota**: O tutor é instruído a responder exclusivamente com base nos documentos do curso. Se nenhum chunk relevante for encontrado, ele informa que não encontrou a informação nos materiais.
 
 ---
 
 ## 📝 Changelog
+
+### v0.5.1 (2026-01-31) - Correções do Chat e File Search
+
+#### 🐛 Correções
+- **Gemini API**: Corrigido parâmetro `fileSearchStoreIds` para `fileSearchStoreNames` que causava erro 400 (`INVALID_ARGUMENT`)
+- **Instruções do Tutor**: System instruction reescrita para eliminar alucinações — o tutor agora responde **exclusivamente** com base nos documentos do File Search, e informa quando não encontra informações relevantes
+- **Scroll do Chat**: Corrigido bug onde a janela de chat não rolava, impedindo a visualização de respostas completas
+  - Layout reestruturado com Flexbox (`flex-col h-full`)
+  - Header e input com `flex-shrink-0`
+  - Área de mensagens com `flex-1 min-h-0 overflow-y-auto`
+
+#### ✅ Melhorias
+- **Scrollbar customizada**: Adicionado estilo visual para scrollbar na área de chat (`.custom-scrollbar`)
+- **Fontes deduplicadas**: Fontes citadas agora usam `Set` para evitar duplicatas
+- **Snippets maiores**: Tamanho dos trechos exibidos aumentado de 200 para 300 caracteres
+- **Debug logging**: Adicionados logs de depuração para `file_search_store_id` e `groundingMetadata`
+
+#### 📦 Arquivos Adicionados/Alterados
+- `server/chat.ts` - Correção de API + melhoria de system instruction
+- `app/(student-course)/student-course/course/[id]/page.tsx` - Reestruturação do layout com Flexbox
+- `app/globals.css` - Estilos de scrollbar customizada
+- `scripts/test-file-search-query.js` - Script de teste direto do File Search API
+
+---
 
 ### v0.5.0 (2026-01-31) - Chat RAG com Gemini
 

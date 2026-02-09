@@ -124,19 +124,24 @@ export async function listStudentCourses(): Promise<StudentCourse[]> {
   }
 
   // Formata os dados
-  return memberships.map((m) => ({
-    // @ts-expect-error - courses é um objeto aninhado
-    id: m.courses.id,
-    // @ts-expect-error - courses é um objeto aninhado
-    name: m.courses.name,
-    // @ts-expect-error - courses é um objeto aninhado
-    description: m.courses.description,
-    // @ts-expect-error - courses é um objeto aninhado
-    owner_id: m.courses.owner_id,
-    // @ts-expect-error - courses é um objeto aninhado
-    created_at: m.courses.created_at,
-    joined_at: m.created_at,
-  }));
+  // O Supabase tipa joins com alias como array, mas retorna objeto em runtime
+  return memberships.map((m) => {
+    const course = m.courses as unknown as {
+      id: string;
+      name: string;
+      description: string | null;
+      owner_id: string;
+      created_at: string;
+    };
+    return {
+      id: course.id,
+      name: course.name,
+      description: course.description,
+      owner_id: course.owner_id,
+      created_at: course.created_at,
+      joined_at: m.created_at,
+    };
+  });
 }
 
 /**
@@ -174,17 +179,20 @@ export async function getStudentCourse(courseId: string): Promise<StudentCourse 
     return null;
   }
 
+  // O Supabase tipa joins com alias como array, mas retorna objeto em runtime
+  const course = membership.courses as unknown as {
+    id: string;
+    name: string;
+    description: string | null;
+    owner_id: string;
+    created_at: string;
+  };
   return {
-    // @ts-expect-error - courses é um objeto aninhado
-    id: membership.courses.id,
-    // @ts-expect-error - courses é um objeto aninhado
-    name: membership.courses.name,
-    // @ts-expect-error - courses é um objeto aninhado
-    description: membership.courses.description,
-    // @ts-expect-error - courses é um objeto aninhado
-    owner_id: membership.courses.owner_id,
-    // @ts-expect-error - courses é um objeto aninhado
-    created_at: membership.courses.created_at,
+    id: course.id,
+    name: course.name,
+    description: course.description,
+    owner_id: course.owner_id,
+    created_at: course.created_at,
     joined_at: membership.created_at,
   };
 }

@@ -100,8 +100,10 @@ export async function uploadFileToStore(
   const client = getGeminiClient();
 
   try {
-    // Cria um Blob a partir do buffer
-    const blob = new Blob([fileBuffer], { type: 'application/pdf' });
+    // Copia Buffer para um ArrayBuffer puro (evita ArrayBufferLike do Node.js)
+    const arrayBuffer = new ArrayBuffer(fileBuffer.byteLength);
+    new Uint8Array(arrayBuffer).set(fileBuffer);
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
     
     // Cria um File object
     const file = new File([blob], fileName, { type: 'application/pdf' });
@@ -126,14 +128,20 @@ export async function uploadFileToStore(
     console.log('Operation response:', JSON.stringify(operation, null, 2));
 
     // Tenta obter o nome do documento de várias formas
+    // A estrutura da resposta pode variar entre versões da API
+    const op = operation as unknown as Record<string, unknown>;
+    const response = (op.response ?? {}) as Record<string, unknown>;
+    const result = (op.result ?? {}) as Record<string, unknown>;
+    const metadata = (op.metadata ?? {}) as Record<string, unknown>;
+    const responseDoc = (response.document ?? {}) as Record<string, unknown>;
+    const metadataDoc = (metadata.document ?? {}) as Record<string, unknown>;
+
     const documentName = 
-      operation.response?.name || 
-      operation.result?.name ||
-      // @ts-expect-error - estrutura pode variar
-      operation.response?.document?.name ||
-      // @ts-expect-error - estrutura pode variar
-      operation.metadata?.document?.name ||
-      null;
+      (response.name as string) || 
+      (result.name as string) ||
+      (responseDoc.name as string) ||
+      (metadataDoc.name as string) ||
+      undefined;
 
     console.log(`Document name extraído: ${documentName}`);
 

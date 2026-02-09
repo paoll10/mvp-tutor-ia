@@ -121,8 +121,16 @@ export async function uploadMaterial(formData: FormData) {
     return { error: 'Erro ao criar material. Tente novamente.' };
   }
 
-  // Processa o upload em background (não bloqueia a resposta)
-  processMaterialUpload(material.id, courseId, file).catch(console.error);
+  // Processa o upload de forma síncrona (necessário para ambientes serverless como Vercel)
+  // Em serverless, processos em background são encerrados quando a resposta é enviada
+  let finalStatus: 'processing' | 'ready' | 'error' = 'processing';
+  try {
+    await processMaterialUpload(material.id, courseId, file);
+    finalStatus = 'ready';
+  } catch (err) {
+    console.error('Erro no processamento do material:', err);
+    finalStatus = 'error';
+  }
 
   revalidatePath(`/mentor/courses/${courseId}/materials`);
 
@@ -131,7 +139,7 @@ export async function uploadMaterial(formData: FormData) {
     material: {
       id: material.id,
       title: material.title,
-      status: 'processing',
+      status: finalStatus,
     },
   };
 }
@@ -219,7 +227,6 @@ export async function deleteMaterial(materialId: string) {
   }
 
   // Verifica permissão
-  // @ts-expect-error - courses é um objeto aninhado
   if (material.courses?.owner_id !== user.id) {
     return { error: 'Você não tem permissão para deletar este material' };
   }
