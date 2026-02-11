@@ -28,29 +28,41 @@ export async function loginCustom(formData: FormData) {
   }
 
   try {
+    // Normaliza o email
+    const normalizedEmail = email.toLowerCase().trim()
+    
     // Busca o usuário na tabela customizada
     const { data: user, error: userError } = await supabase
       .schema('mentoria')
       .from('users')
       .select('id, email, password_hash, role, full_name')
-      .eq('email', email.toLowerCase().trim())
+      .eq('email', normalizedEmail)
       .maybeSingle()
 
     // Log para debug
-    console.log('🔍 Buscando usuário:', email.toLowerCase().trim())
-    console.log('📊 Resultado:', { user, userError })
-
+    console.log('🔍 Buscando usuário:', normalizedEmail)
+    
     if (userError) {
       console.error('❌ Erro ao buscar usuário:', userError)
+      // Se o erro for de schema/tabela não encontrada, retorna mensagem específica
+      if (userError.message?.includes('does not exist') || userError.message?.includes('schema')) {
+        return { error: 'Tabela de usuários não encontrada. Execute o SQL de criação primeiro.' }
+      }
       return { error: `Erro ao buscar usuário: ${userError.message}` }
     }
 
     if (!user) {
-      console.error('❌ Usuário não encontrado:', email)
+      console.error('❌ Usuário não encontrado:', normalizedEmail)
       return { error: 'Email ou senha incorretos' }
     }
 
     console.log('✅ Usuário encontrado:', user.email, user.role)
+
+    // Verifica se tem hash de senha
+    if (!user.password_hash || user.password_hash.length < 20) {
+      console.error('❌ Hash de senha inválido para usuário:', user.email)
+      return { error: 'Senha não configurada corretamente. Execute o SQL de criação de usuários.' }
+    }
 
     // Verifica a senha usando bcrypt
     const isValidPassword = await verifyPassword(password, user.password_hash)
@@ -101,8 +113,19 @@ export async function loginCustom(formData: FormData) {
       redirect('/login')
     }
   } catch (err: any) {
-    console.error('Erro no login customizado:', err)
-    return { error: 'Erro ao fazer login. Tente novamente.' }
+    console.error('❌ Erro no login customizado:', err)
+    console.error('Stack:', err.stack)
+    
+    // Mensagens de erro mais específicas
+    if (err.message?.includes('relation') || err.message?.includes('does not exist')) {
+      return { error: 'Tabela de usuários não encontrada. Execute o SQL de criação primeiro.' }
+    }
+    
+    if (err.message?.includes('schema')) {
+      return { error: 'Schema "mentoria" não encontrado. Execute o SQL de criação primeiro.' }
+    }
+    
+    return { error: `Erro ao fazer login: ${err.message || 'Erro desconhecido'}` }
   }
 }
 
