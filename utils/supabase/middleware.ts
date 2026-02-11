@@ -1,150 +1,83 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Rotas públicas (não precisam de autenticação)
 const PUBLIC_ROUTES = ['/login', '/auth', '/forgot-password', '/reset-password']
 
-// Rotas que não precisam de profile (mas precisam de autenticação)
-const NO_PROFILE_ROUTES = ['/onboarding', '/auth']
+// Interface para usuário customizado
+interface CustomUser {
+  id: string
+  email: string
+  role: 'mentor' | 'aluno'
+  full_name: string | null
+}
+
+/**
+ * Obtém o usuário atual dos cookies
+ */
+function getCurrentUser(request: NextRequest): CustomUser | null {
+  const userData = request.cookies.get('user_data')
+  
+  if (!userData?.value) {
+    return null
+  }
+
+  try {
+    return JSON.parse(userData.value) as CustomUser
+  } catch {
+    return null
+  }
+}
 
 export async function updateSession(request: NextRequest) {
   try {
-    // Verificar se as variáveis de ambiente estão configuradas
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.error('Variáveis de ambiente não configuradas')
-      // Se não tiver variáveis, permite acesso às rotas públicas
-      const pathname = request.nextUrl.pathname
-      const PUBLIC_ROUTES = ['/login', '/auth', '/forgot-password', '/reset-password']
-      const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/'
-      
+    const pathname = request.nextUrl.pathname
+    
+    // Verifica se é rota pública
+    const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/'
+    
+    // Obtém o usuário dos cookies
+    const user = getCurrentUser(request)
+    
+    // Se NÃO houver usuário logado
+    if (!user) {
+      // E a rota NÃO for pública → redireciona para login
       if (!isPublicRoute) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'
         return NextResponse.redirect(url)
       }
-      
+      // Se for rota pública, permite acesso
       return NextResponse.next({ request })
     }
-
-    let supabaseResponse = NextResponse.next({
-      request,
-    })
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              request.cookies.set(name, value)
-            )
-            supabaseResponse = NextResponse.next({
-              request,
-            })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-  const pathname = request.nextUrl.pathname
-
-  // Verifica se é rota pública
-  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/'
-
-  // IMPORTANT: You *must* run the getUser method in the middleware
-  // to maintain auth session (refreshing tokens, etc.)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Se NÃO houver usuário
-  if (!user) {
-    // E a rota NÃO for pública
-    if (!isPublicRoute) {
+    
+    // Se HOUVER usuário logado
+    
+    // Se está tentando acessar login → redireciona para dashboard correto
+    if (pathname.startsWith('/login') || pathname === '/') {
       const url = request.nextUrl.clone()
-      url.pathname = '/login'
+      url.pathname = user.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
       return NextResponse.redirect(url)
     }
-    return supabaseResponse
-  }
-
-  const isOnboarding = pathname.startsWith('/onboarding')
-  const isNoProfileRoute = NO_PROFILE_ROUTES.some(route => pathname.startsWith(route))
-
-  // Se já está no onboarding, permite acesso (evita loop)
-  if (isOnboarding) {
-    return supabaseResponse
-  }
-
-  // Se HOUVER usuário logado
-  // Verifica se tem profile cadastrado
-  let profile: { role: string } | null = null
-  let hasProfile = false
-  
-  // Garantir que user não é null (já verificado acima)
-  if (!user) {
-    return supabaseResponse
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .schema('mentoria')
-      .from('profiles')
-      .select('role')
-      .eq('user_id', user.id)
-      .maybeSingle()
     
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-      console.error('Erro ao buscar profile:', error)
-      // Se o schema não existir, permite acesso ao onboarding
-      if (error.message?.includes('schema') || error.message?.includes('does not exist')) {
-        // Não redireciona aqui, apenas permite que continue
-        hasProfile = false
-        profile = null
-      }
-    } else if (data) {
-      profile = data
-      hasProfile = true
+    // Se está tentando acessar área do mentor mas é aluno → redireciona
+    if (pathname.startsWith('/mentor') && user.role !== 'mentor') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/student/dashboard'
+      return NextResponse.redirect(url)
     }
-  } catch (err) {
-    console.error('Erro ao verificar profile:', err)
-    // Em caso de erro, permite acesso ao onboarding
-    hasProfile = false
-    profile = null
-  }
-
-  // Se NÃO tem profile e NÃO está no onboarding → vai pro onboarding
-  if (!hasProfile && !isNoProfileRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/onboarding'
-    return NextResponse.redirect(url)
-  }
-
-  // Se TEM profile e está no onboarding → vai pro dashboard correto
-  if (hasProfile && profile && isOnboarding) {
-    const url = request.nextUrl.clone()
-    url.pathname = profile.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
-    return NextResponse.redirect(url)
-  }
-
-  // Se está tentando acessar login/raiz e já está logado com profile
-  if (hasProfile && profile && (pathname.startsWith('/login') || pathname === '/')) {
-    const url = request.nextUrl.clone()
-    url.pathname = profile.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
-    return NextResponse.redirect(url)
-  }
-
-    return supabaseResponse
+    
+    // Se está tentando acessar área do aluno mas é mentor → redireciona
+    if (pathname.startsWith('/student') && user.role !== 'aluno') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/mentor/dashboard'
+      return NextResponse.redirect(url)
+    }
+    
+    // Permite acesso
+    return NextResponse.next({ request })
   } catch (error) {
     console.error('Erro no middleware:', error)
-    // Em caso de erro, tenta redirecionar para login
+    // Em caso de erro, redireciona para login
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

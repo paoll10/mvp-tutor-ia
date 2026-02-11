@@ -1,6 +1,6 @@
 'use client';
 
-import { signOut } from '@/app/auth/actions';
+import { logoutCustom } from '@/server/auth-custom';
 
 interface LogoutButtonProps {
   variant?: 'icon' | 'full' | 'menu';
@@ -9,7 +9,7 @@ interface LogoutButtonProps {
 
 export default function LogoutButton({ variant = 'full', className = '' }: LogoutButtonProps) {
   const handleLogout = async () => {
-    await signOut();
+    await logoutCustom();
   };
 
   if (variant === 'icon') {
