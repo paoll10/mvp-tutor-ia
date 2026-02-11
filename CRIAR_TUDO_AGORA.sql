@@ -6,10 +6,18 @@
 -- 1. Criar schema se não existir
 CREATE SCHEMA IF NOT EXISTS mentoria;
 
--- 2. Dar permissões no schema
+-- 2. Dar permissões no schema (com ALTER DEFAULT PRIVILEGES)
 GRANT USAGE ON SCHEMA mentoria TO anon;
 GRANT USAGE ON SCHEMA mentoria TO authenticated;
 GRANT USAGE ON SCHEMA mentoria TO service_role;
+GRANT ALL ON SCHEMA mentoria TO anon;
+GRANT ALL ON SCHEMA mentoria TO authenticated;
+GRANT ALL ON SCHEMA mentoria TO service_role;
+
+-- Dar permissões padrão para tabelas futuras
+ALTER DEFAULT PRIVILEGES IN SCHEMA mentoria GRANT ALL ON TABLES TO anon;
+ALTER DEFAULT PRIVILEGES IN SCHEMA mentoria GRANT ALL ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES IN SCHEMA mentoria GRANT ALL ON TABLES TO service_role;
 
 -- 3. Criar tabela de usuários (se não existir)
 CREATE TABLE IF NOT EXISTS mentoria.users (
@@ -53,10 +61,21 @@ CREATE TRIGGER update_users_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION mentoria.update_updated_at_column();
 
--- 8. Dar permissões na tabela
-GRANT ALL ON TABLE mentoria.users TO authenticated;
-GRANT ALL ON TABLE mentoria.users TO anon;
+-- 8. Dar permissões na tabela (com SELECT explícito)
+GRANT USAGE ON SCHEMA mentoria TO anon, authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE mentoria.users TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE mentoria.users TO anon;
 GRANT ALL ON TABLE mentoria.users TO service_role;
+
+-- Habilitar RLS (Row Level Security) se necessário
+ALTER TABLE mentoria.users ENABLE ROW LEVEL SECURITY;
+
+-- Política para permitir leitura para usuários autenticados
+DROP POLICY IF EXISTS "Users are viewable by authenticated users" ON mentoria.users;
+CREATE POLICY "Users are viewable by authenticated users" 
+  ON mentoria.users FOR SELECT 
+  TO authenticated, anon
+  USING (true);
 
 -- 9. CRIAR USUÁRIO MENTOR
 -- Email: mentor@mentoria.com
