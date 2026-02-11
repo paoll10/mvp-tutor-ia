@@ -41,6 +41,11 @@ BEGIN
     'aluno'
   );
   
+  -- Converte 'student' para 'aluno' (compatibilidade)
+  IF user_role = 'student' THEN
+    user_role := 'aluno';
+  END IF;
+  
   -- Garante que o role é válido
   IF user_role NOT IN ('mentor', 'aluno') THEN
     user_role := 'aluno';
@@ -78,10 +83,11 @@ CREATE TRIGGER on_auth_user_created
 INSERT INTO mentoria.profiles (user_id, role, full_name)
 SELECT
   au.id,
-  COALESCE(
-    (au.raw_user_meta_data->>'role')::text,
-    'aluno'
-  )::text,
+  CASE 
+    WHEN (au.raw_user_meta_data->>'role')::text = 'student' THEN 'aluno'
+    WHEN (au.raw_user_meta_data->>'role')::text IN ('mentor', 'aluno') THEN (au.raw_user_meta_data->>'role')::text
+    ELSE 'aluno'
+  END,
   COALESCE(
     au.raw_user_meta_data->>'full_name',
     split_part(au.email, '@', 1)
