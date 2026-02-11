@@ -126,63 +126,77 @@ export async function loginCustom(formData: FormData) {
     console.log('🔐 Verificando senha...')
 
     // Verifica senha com bcrypt
+    console.log('🔐 Verificando senha...')
+    console.log('Hash no banco (primeiros 20 chars):', user.password_hash.substring(0, 20) + '...')
+    
     let isValidPassword = false
     try {
       isValidPassword = await bcrypt.compare(password, user.password_hash)
       console.log('✅ Resultado da verificação:', isValidPassword ? 'Senha válida' : 'Senha inválida')
+      
+      if (!isValidPassword) {
+        console.error('❌ Senha incorreta')
+        console.log('Senha digitada:', password.substring(0, 3) + '...')
+        return { error: 'Email ou senha incorretos. Verifique se digitou corretamente.' }
+      }
     } catch (bcryptErr: any) {
       console.error('❌ Erro ao verificar senha:', bcryptErr.message)
-      return { error: 'Erro ao verificar senha. Tente novamente.' }
-    }
-
-    if (!isValidPassword) {
-      console.error('❌ Senha incorreta')
-      return { error: 'Email ou senha incorretos' }
+      console.error('Stack:', bcryptErr.stack)
+      return { error: `Erro ao verificar senha: ${bcryptErr.message}` }
     }
     
     console.log('✅ Login válido! Criando sessão...')
 
     // Cria sessão
-    const cookieStore = await cookies()
-    
-    // Token de sessão
-    const sessionToken = `${Date.now()}-${Math.random().toString(36).substring(2)}`
-    cookieStore.set('custom_session', sessionToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 dias
-      path: '/',
-    })
+    try {
+      const cookieStore = await cookies()
+      
+      // Token de sessão
+      const sessionToken = `${Date.now()}-${Math.random().toString(36).substring(2)}`
+      cookieStore.set('custom_session', sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 dias
+        path: '/',
+      })
 
-    // Dados do usuário
-    const userData = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      full_name: user.full_name || null,
-    }
-    
-    cookieStore.set('user_data', JSON.stringify(userData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    })
+      // Dados do usuário
+      const userData = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        full_name: user.full_name || null,
+      }
+      
+      cookieStore.set('user_data', JSON.stringify(userData), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      })
 
-    // Revalida rotas
-    revalidatePath('/', 'layout')
-    revalidatePath('/mentor/dashboard', 'layout')
-    revalidatePath('/student/dashboard', 'layout')
+      console.log('✅ Cookies criados com sucesso!')
+      
+      // Revalida rotas
+      revalidatePath('/', 'layout')
+      revalidatePath('/mentor/dashboard', 'layout')
+      revalidatePath('/student/dashboard', 'layout')
 
-    // Redireciona
-    if (user.role === 'mentor') {
-      redirect('/mentor/dashboard')
-    } else if (user.role === 'aluno') {
-      redirect('/student/dashboard')
-    } else {
-      redirect('/login')
+      console.log('🔄 Redirecionando para:', user.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard')
+
+      // Redireciona
+      if (user.role === 'mentor') {
+        redirect('/mentor/dashboard')
+      } else if (user.role === 'aluno') {
+        redirect('/student/dashboard')
+      } else {
+        redirect('/login')
+      }
+    } catch (cookieErr: any) {
+      console.error('❌ Erro ao criar cookies:', cookieErr.message)
+      return { error: `Erro ao criar sessão: ${cookieErr.message}` }
     }
   } catch (err: any) {
     console.error('❌ ERRO CRÍTICO NO LOGIN:', err)
