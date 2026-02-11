@@ -26,6 +26,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Remove trigger se já existir e cria novamente
+DROP TRIGGER IF EXISTS update_users_updated_at ON mentoria.users;
 CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON mentoria.users
   FOR EACH ROW
