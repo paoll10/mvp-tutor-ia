@@ -24,6 +24,10 @@ export default function MentorGlobalLayout({
               <span className="material-symbols-outlined fill">dashboard</span>
               <span className="text-sm font-bold">Painel</span>
             </Link>
+            <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="/mentor/students">
+              <span className="material-symbols-outlined">people</span>
+              <span className="text-sm font-medium">Alunos</span>
+            </Link>
             <Link className="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:bg-[#e8f1f2] dark:hover:bg-[#444] hover:text-text-main transition-colors" href="#">
               <span className="material-symbols-outlined">chat_bubble</span>
               <span className="text-sm font-medium">Mensagens</span>

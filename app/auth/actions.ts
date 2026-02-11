@@ -38,15 +38,19 @@ export async function signup(formData: FormData) {
   const role = formData.get('role') as string
 
   if (!email || !password) {
-    return { error: 'Please provide both email and password' }
+    return { error: 'Por favor, forneça email e senha' }
   }
 
-  const { error } = await supabase.auth.signUp({
+  // Converte 'student' para 'aluno' e 'mentor' para 'mentor'
+  const profileRole = role === 'mentor' ? 'mentor' : 'aluno'
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        role: role || 'student',
+        role: profileRole, // Passa o role no user_metadata
+        full_name: email.split('@')[0], // Nome padrão baseado no email
       },
       emailRedirectTo: `${origin}/auth/callback`,
     },
@@ -56,9 +60,42 @@ export async function signup(formData: FormData) {
     return { error: error.message }
   }
 
+  // O trigger no banco cria o profile automaticamente
+  // Mas vamos verificar se foi criado (caso o trigger não tenha executado)
+  if (data.user) {
+    // Aguarda um pouco para o trigger executar
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // Verifica se o profile foi criado
+    const { data: profile } = await supabase
+      .schema('mentoria')
+      .from('profiles')
+      .select('*')
+      .eq('user_id', data.user.id)
+      .single()
+
+    // Se não foi criado, cria manualmente
+    if (!profile) {
+      await supabase
+        .schema('mentoria')
+        .from('profiles')
+        .insert({
+          user_id: data.user.id,
+          role: profileRole,
+          full_name: email.split('@')[0],
+        })
+    }
+  }
+
   revalidatePath('/', 'layout')
-  // Typically redirect to a verification page or login
-  return { success: 'Check your email to verify your account.' }
+  
+  // Se o email foi confirmado automaticamente, redireciona
+  if (data.user?.email_confirmed_at) {
+    redirect('/')
+  }
+  
+  // Caso contrário, pede para verificar o email
+  return { success: 'Verifique seu email para confirmar a conta.' }
 }
 
 export async function signInWithGoogle() {
