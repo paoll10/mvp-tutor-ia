@@ -27,25 +27,53 @@ export async function login(formData: FormData) {
   if (data.user) {
     revalidatePath('/', 'layout')
     
-    // Busca o profile do usuário para redirecionar corretamente
-    const { data: profile, error: profileError } = await supabase
-      .schema('mentoria')
-      .from('profiles')
-      .select('role')
-      .eq('user_id', data.user.id)
-      .maybeSingle() // Usa maybeSingle() para não dar erro se não encontrar
+    // Tenta buscar o profile
+    let profileRole: 'mentor' | 'aluno' | null = null
+    
+    try {
+      const { data: profile } = await supabase
+        .schema('mentoria')
+        .from('profiles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .maybeSingle()
 
-    // Se tem profile, redireciona direto para o dashboard correto (SEM onboarding)
-    if (profile && !profileError && profile.role) {
-      if (profile.role === 'mentor') {
-        redirect('/mentor/dashboard')
-      } else if (profile.role === 'aluno') {
-        redirect('/student/dashboard')
+      if (profile?.role) {
+        profileRole = profile.role as 'mentor' | 'aluno'
+      }
+    } catch (err) {
+      // Se der erro ao buscar (schema não existe, etc), tenta criar baseado no email
+      console.error('Erro ao buscar profile, tentando criar:', err)
+      
+      // Se o email contém "mentor", assume que é mentor
+      if (email.toLowerCase().includes('mentor')) {
+        profileRole = 'mentor'
+      } else {
+        profileRole = 'aluno'
+      }
+      
+      // Tenta criar o profile automaticamente
+      try {
+        await supabase
+          .schema('mentoria')
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            role: profileRole,
+            full_name: email.split('@')[0],
+          })
+      } catch (createErr) {
+        // Se não conseguir criar, continua com o role assumido
+        console.error('Erro ao criar profile:', createErr)
       }
     }
     
-    // Se não tem profile, redireciona para onboarding
-    redirect('/onboarding')
+    // Redireciona direto para o dashboard correto (SEM onboarding)
+    if (profileRole === 'mentor') {
+      redirect('/mentor/dashboard')
+    } else {
+      redirect('/student/dashboard')
+    }
   } else {
     revalidatePath('/', 'layout')
     redirect('/')
