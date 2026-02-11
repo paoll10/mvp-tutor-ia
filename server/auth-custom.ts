@@ -21,7 +21,12 @@ function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  console.log('🔧 Verificando variáveis de ambiente:')
+  console.log('URL:', url ? '✅ Configurado' : '❌ Faltando')
+  console.log('Key:', key ? '✅ Configurado (primeiros 20 chars: ' + key.substring(0, 20) + '...)' : '❌ Faltando')
+
   if (!url || !key) {
+    console.error('❌ Variáveis de ambiente não configuradas!')
     throw new Error('Variáveis de ambiente do Supabase não configuradas')
   }
 
@@ -43,8 +48,14 @@ export async function loginCustom(formData: FormData) {
   const normalizedEmail = email.toLowerCase()
 
   try {
+    console.log('\n' + '='.repeat(60))
+    console.log('🔐 INICIANDO LOGIN')
+    console.log('='.repeat(60))
+    console.log('Email:', normalizedEmail)
+    
     // Cria cliente Supabase
     const supabase = getSupabaseClient()
+    console.log('✅ Cliente Supabase criado com sucesso')
 
     // Busca usuário - tenta com schema primeiro, depois sem schema
     let user: any = null
