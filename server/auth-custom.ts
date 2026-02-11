@@ -84,37 +84,63 @@ export async function loginCustom(formData: FormData) {
     // Se não encontrou usuário
     if (!user) {
       if (userError) {
-        console.error('Erro ao buscar usuário:', userError.message)
+        console.error('❌ Erro ao buscar usuário:', {
+          code: userError.code,
+          message: userError.message,
+          details: userError.details,
+          hint: userError.hint
+        })
+        
+        if (userError.code === 'PGRST116' || userError.message?.includes('No rows')) {
+          return { error: 'Email ou senha incorretos' }
+        }
         
         if (userError.message?.includes('relation') || userError.message?.includes('does not exist')) {
-          return { error: 'Tabela não encontrada. Execute atualizar_tabela_users.sql no Supabase' }
+          return { error: 'Tabela não encontrada. Execute CRIAR_TUDO_AGORA.sql no Supabase' }
         }
         
-        if (userError.message?.includes('schema')) {
-          return { error: 'Schema não encontrado. Execute atualizar_tabela_users.sql no Supabase' }
+        if (userError.message?.includes('schema') || userError.message?.includes('permission')) {
+          return { error: 'Schema não encontrado ou sem permissão. Execute CRIAR_TUDO_AGORA.sql no Supabase' }
         }
+        
+        return { error: `Erro ao buscar usuário: ${userError.message || 'Erro desconhecido'}` }
       }
       
+      console.error('❌ Usuário não encontrado no banco de dados')
       return { error: 'Email ou senha incorretos' }
     }
+    
+    console.log('✅ Usuário encontrado:', user.email, user.role)
 
     // Verifica hash de senha
-    if (!user.password_hash || typeof user.password_hash !== 'string' || user.password_hash.length < 20) {
-      return { error: 'Senha não configurada. Execute criar_login_simples.sql no Supabase' }
+    if (!user.password_hash || typeof user.password_hash !== 'string') {
+      console.error('❌ Hash de senha não encontrado ou inválido')
+      return { error: 'Senha não configurada. Execute CRIAR_TUDO_AGORA.sql no Supabase' }
     }
+    
+    if (user.password_hash.length < 20) {
+      console.error('❌ Hash de senha muito curto:', user.password_hash.length)
+      return { error: 'Hash de senha inválido. Execute CRIAR_TUDO_AGORA.sql no Supabase' }
+    }
+    
+    console.log('🔐 Verificando senha...')
 
     // Verifica senha com bcrypt
     let isValidPassword = false
     try {
       isValidPassword = await bcrypt.compare(password, user.password_hash)
-    } catch (bcryptErr) {
-      console.error('Erro ao verificar senha:', bcryptErr)
+      console.log('✅ Resultado da verificação:', isValidPassword ? 'Senha válida' : 'Senha inválida')
+    } catch (bcryptErr: any) {
+      console.error('❌ Erro ao verificar senha:', bcryptErr.message)
       return { error: 'Erro ao verificar senha. Tente novamente.' }
     }
 
     if (!isValidPassword) {
+      console.error('❌ Senha incorreta')
       return { error: 'Email ou senha incorretos' }
     }
+    
+    console.log('✅ Login válido! Criando sessão...')
 
     // Cria sessão
     const cookieStore = await cookies()
@@ -159,24 +185,30 @@ export async function loginCustom(formData: FormData) {
       redirect('/login')
     }
   } catch (err: any) {
-    console.error('Erro crítico no login:', err)
+    console.error('❌ ERRO CRÍTICO NO LOGIN:', err)
+    console.error('Stack:', err.stack)
     
     // Mensagens de erro específicas
     const errorMessage = err.message || 'Erro desconhecido'
     
     if (errorMessage.includes('Variáveis de ambiente')) {
-      return { error: 'Configuração incompleta. Verifique as variáveis de ambiente na Vercel.' }
+      return { error: 'Configuração incompleta. Verifique NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY na Vercel.' }
     }
     
     if (errorMessage.includes('relation') || errorMessage.includes('does not exist')) {
-      return { error: 'Tabela não encontrada. Execute atualizar_tabela_users.sql no Supabase SQL Editor.' }
+      return { error: 'Tabela não encontrada. Execute CRIAR_TUDO_AGORA.sql no Supabase SQL Editor.' }
     }
     
     if (errorMessage.includes('schema')) {
-      return { error: 'Schema não encontrado. Execute atualizar_tabela_users.sql no Supabase SQL Editor.' }
+      return { error: 'Schema não encontrado. Execute CRIAR_TUDO_AGORA.sql no Supabase SQL Editor.' }
     }
     
-    return { error: `Erro: ${errorMessage}` }
+    if (errorMessage.includes('connection') || errorMessage.includes('network') || errorMessage.includes('fetch')) {
+      return { error: 'Erro de conexão com o banco de dados. Verifique sua conexão com a internet.' }
+    }
+    
+    // Retorna mensagem mais específica
+    return { error: `Erro: ${errorMessage}. Verifique os logs no Vercel para mais detalhes.` }
   }
 }
 
