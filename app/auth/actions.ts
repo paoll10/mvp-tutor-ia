@@ -15,7 +15,7 @@ export async function login(formData: FormData) {
     return { error: 'Please provide both email and password' }
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
@@ -24,9 +24,39 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  revalidatePath('/', 'layout')
-  // Redireciona para raiz - o middleware vai verificar profile e redirecionar corretamente
-  redirect('/')
+  if (data.user) {
+    // Busca o profile do usuário para redirecionar corretamente
+    try {
+      const { data: profile } = await supabase
+        .schema('mentoria')
+        .from('profiles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single()
+
+      revalidatePath('/', 'layout')
+
+      // Se tem profile, redireciona para o dashboard correto
+      if (profile) {
+        if (profile.role === 'mentor') {
+          redirect('/mentor/dashboard')
+        } else {
+          redirect('/student/dashboard')
+        }
+      } else {
+        // Se não tem profile, vai para onboarding
+        redirect('/onboarding')
+      }
+    } catch (err) {
+      // Se houver erro ao buscar profile (schema não existe, etc), vai para onboarding
+      console.error('Erro ao buscar profile:', err)
+      revalidatePath('/', 'layout')
+      redirect('/onboarding')
+    }
+  } else {
+    revalidatePath('/', 'layout')
+    redirect('/')
+  }
 }
 
 export async function signup(formData: FormData) {
