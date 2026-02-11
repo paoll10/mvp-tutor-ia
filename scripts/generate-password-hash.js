@@ -3,7 +3,7 @@
  * Execute: node scripts/generate-password-hash.js <senha>
  */
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 async function generateHash(password) {
   const saltRounds = 10;

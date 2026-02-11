@@ -1,15 +1,12 @@
 -- =============================================
--- CRIAR USUÁRIOS PARA LOGIN CUSTOMIZADO
--- Execute este SQL após gerar os hashes de senha
+-- CRIAR LOGIN SIMPLES - MENTOR E ALUNO
+-- Execute este SQL no Supabase SQL Editor
 -- =============================================
 
--- IMPORTANTE: Primeiro gere os hashes usando o script:
--- node scripts/generate-password-hash.js "Mentor123!@#"
--- node scripts/generate-password-hash.js "Aluno123!@#"
+-- Primeiro, execute o arquivo: atualizar_tabela_users.sql
+-- Depois execute este SQL para criar os usuários
 
--- Depois substitua os hashes abaixo pelos hashes gerados
-
--- Criar usuário mentor
+-- Criar usuário MENTOR
 -- Email: mentor@mentoria.com
 -- Senha: Mentor123!@#
 INSERT INTO mentoria.users (email, password_hash, role, full_name)
@@ -25,7 +22,7 @@ SET
   role = EXCLUDED.role,
   full_name = EXCLUDED.full_name;
 
--- Criar usuário aluno
+-- Criar usuário ALUNO
 -- Email: aluno@mentoria.com
 -- Senha: Aluno123!@#
 INSERT INTO mentoria.users (email, password_hash, role, full_name)
@@ -42,13 +39,15 @@ SET
   full_name = EXCLUDED.full_name;
 
 -- =============================================
--- CREDENCIAIS:
+-- ✅ USUÁRIOS CRIADOS!
 -- =============================================
 -- MENTOR:
--- Email: mentor@mentoria.com
--- Senha: Mentor123!@#
--- =============================================
+--   Email: mentor@mentoria.com
+--   Senha: Mentor123!@#
+--   Dashboard: /mentor/dashboard
+--
 -- ALUNO:
--- Email: aluno@mentoria.com
--- Senha: Aluno123!@#
+--   Email: aluno@mentoria.com
+--   Senha: Aluno123!@#
+--   Dashboard: /student/dashboard
 -- =============================================
