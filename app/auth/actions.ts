@@ -29,24 +29,24 @@ export async function login(formData: FormData) {
     
     // Tenta buscar o profile, mas não quebra se der erro
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .schema('mentoria')
         .from('profiles')
         .select('role')
         .eq('user_id', data.user.id)
-        .single()
+        .maybeSingle() // Usa maybeSingle() em vez de single() para não dar erro se não encontrar
 
-      // Se tem profile, redireciona para o dashboard correto
-      if (profile?.role) {
+      // Se tem profile e não há erro, redireciona para o dashboard correto
+      if (profile && !profileError && profile.role) {
         if (profile.role === 'mentor') {
           redirect('/mentor/dashboard')
         } else if (profile.role === 'aluno') {
           redirect('/student/dashboard')
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       // Ignora erro silenciosamente - o middleware vai tratar
-      console.error('Erro ao buscar profile (não crítico):', err)
+      console.error('Erro ao buscar profile (não crítico):', err?.message || err)
     }
     
     // Sempre redireciona para raiz - o middleware vai verificar o profile e redirecionar
