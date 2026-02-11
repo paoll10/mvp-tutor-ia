@@ -34,16 +34,28 @@ export async function loginCustom(formData: FormData) {
       .from('users')
       .select('id, email, password_hash, role, full_name')
       .eq('email', email.toLowerCase().trim())
-      .single()
+      .maybeSingle()
 
-    if (userError || !user) {
+    // Log para debug
+    console.log('🔍 Buscando usuário:', email.toLowerCase().trim())
+    console.log('📊 Resultado:', { user, userError })
+
+    if (userError) {
+      console.error('❌ Erro ao buscar usuário:', userError)
+      return { error: `Erro ao buscar usuário: ${userError.message}` }
+    }
+
+    if (!user) {
+      console.error('❌ Usuário não encontrado:', email)
       return { error: 'Email ou senha incorretos' }
     }
 
+    console.log('✅ Usuário encontrado:', user.email, user.role)
+
     // Verifica a senha usando bcrypt
-    // Nota: Em produção, use uma biblioteca de bcrypt no servidor
-    // Por enquanto, vamos usar uma verificação simples
     const isValidPassword = await verifyPassword(password, user.password_hash)
+
+    console.log('🔐 Verificação de senha:', isValidPassword ? '✅ Válida' : '❌ Inválida')
 
     if (!isValidPassword) {
       return { error: 'Email ou senha incorretos' }
