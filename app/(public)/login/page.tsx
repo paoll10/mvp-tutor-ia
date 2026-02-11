@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { login, signup } from '@/app/auth/actions';
+import { loginCustom, signupCustom } from '@/server/auth-custom';
 import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
-  const [role, setRole] = useState<'student' | 'mentor'>('student');
+  const [role, setRole] = useState<'aluno' | 'mentor'>('aluno');
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,13 +20,17 @@ export default function LoginPage() {
     setMessage(null);
 
     const formData = new FormData(event.currentTarget);
-    formData.append('role', role);
+    // Converte 'aluno' para o formato esperado
+    const roleFormatted = role === 'aluno' ? 'aluno' : 'mentor';
+    formData.append('role', roleFormatted);
 
     let result: { error?: string; success?: string } | undefined;
     if (mode === 'login') {
-      result = await login(formData);
+      // Usa login customizado (tabela do Supabase)
+      result = await loginCustom(formData);
     } else {
-      result = await signup(formData);
+      // Usa signup customizado (tabela do Supabase)
+      result = await signupCustom(formData);
     }
 
     if (result?.error) {
@@ -201,18 +206,18 @@ export default function LoginPage() {
             <div className="relative flex w-full bg-[#e8f1f2] dark:bg-gray-700 rounded-lg p-1 h-12">
               <div 
                 className="absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-surface-light dark:bg-gray-600 rounded-md shadow-sm transition-transform duration-300 ease-in-out transform"
-                style={{ transform: role === 'student' ? 'translateX(0%)' : 'translateX(100%)' }}
+                style={{ transform: role === 'aluno' ? 'translateX(0%)' : 'translateX(100%)' }}
               ></div>
               <label className="flex-1 relative z-10 cursor-pointer">
                 <input 
                   className="peer sr-only" 
                   name="role" 
                   type="radio" 
-                  value="student" 
-                  checked={role === 'student'} 
-                  onChange={() => setRole('student')}
+                  value="aluno" 
+                  checked={role === 'aluno'} 
+                  onChange={() => setRole('aluno')}
                 />
-                <div className={`flex h-full w-full items-center justify-center rounded-md text-sm font-medium transition-colors ${role === 'student' ? 'text-primary font-bold dark:text-white' : 'text-text-muted dark:text-gray-400'}`}>
+                <div className={`flex h-full w-full items-center justify-center rounded-md text-sm font-medium transition-colors ${role === 'aluno' ? 'text-primary font-bold dark:text-white' : 'text-text-muted dark:text-gray-400'}`}>
                   Aluno
                 </div>
               </label>
