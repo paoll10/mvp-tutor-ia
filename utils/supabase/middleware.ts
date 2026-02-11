@@ -59,14 +59,35 @@ export async function updateSession(request: NextRequest) {
 
   // Se HOUVER usuário logado
   // Verifica se tem profile cadastrado
-  const { data: profile } = await supabase
-    .schema('mentoria')
-    .from('profiles')
-    .select('role')
-    .eq('user_id', user.id)
-    .single()
+  let profile = null
+  let hasProfile = false
+  
+  try {
+    const { data, error } = await supabase
+      .schema('mentoria')
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Erro ao buscar profile:', error)
+      // Se o schema não existir, redireciona para onboarding
+      if (error.message?.includes('schema') || error.message?.includes('does not exist')) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding'
+        return NextResponse.redirect(url)
+      }
+    }
+    
+    profile = data
+    hasProfile = !!profile
+  } catch (err) {
+    console.error('Erro ao verificar profile:', err)
+    // Em caso de erro, permite acesso ao onboarding
+    hasProfile = false
+  }
 
-  const hasProfile = !!profile
   const isOnboarding = pathname.startsWith('/onboarding')
   const isNoProfileRoute = NO_PROFILE_ROUTES.some(route => pathname.startsWith(route))
 
