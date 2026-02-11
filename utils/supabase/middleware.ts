@@ -99,14 +99,14 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Se TEM profile e está no onboarding → vai pro dashboard correto
-  if (hasProfile && isOnboarding) {
+  if (hasProfile && profile && isOnboarding) {
     const url = request.nextUrl.clone()
     url.pathname = profile.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
     return NextResponse.redirect(url)
   }
 
   // Se está tentando acessar login/raiz e já está logado com profile
-  if (hasProfile && (pathname.startsWith('/login') || pathname === '/')) {
+  if (hasProfile && profile && (pathname.startsWith('/login') || pathname === '/')) {
     const url = request.nextUrl.clone()
     url.pathname = profile.role === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
     return NextResponse.redirect(url)
