@@ -24,15 +24,15 @@ export default function LoginPage() {
         setIsLoading(false);
       } else {
         // Se não houver erro, o loginCustom já redireciona automaticamente
-        // Mas adicionamos um fallback caso o redirect não funcione
+        // Aguarda um pouco e força reload se necessário
         setTimeout(() => {
-          // Força reload para garantir que os cookies sejam lidos
-          window.location.href = '/';
-        }, 100);
+          router.push('/');
+          router.refresh();
+        }, 500);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro no login:', err);
-      setMessage('Erro ao fazer login. Tente novamente.');
+      setMessage(err.message || 'Erro ao fazer login. Tente novamente.');
       setIsLoading(false);
     }
   };
