@@ -30,7 +30,7 @@ CREATE OR REPLACE FUNCTION mentoria.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = mentoria, public, pg_temp
 AS $$
 DECLARE
   user_role text;
@@ -59,6 +59,11 @@ BEGIN
   ON CONFLICT (user_id) DO NOTHING;
   
   RETURN NEW;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Log do erro mas não impede a criação do usuário
+    RAISE WARNING 'Erro ao criar profile para usuário %: %', NEW.id, SQLERRM;
+    RETURN NEW;
 END;
 $$;
 
