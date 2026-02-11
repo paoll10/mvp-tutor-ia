@@ -84,7 +84,20 @@ export async function createProfile(formData: FormData) {
 
   if (error) {
     console.error('Erro ao criar profile:', error)
-    return { error: 'Erro ao criar perfil. Tente novamente.' }
+    console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
+    
+    // Mensagem de erro mais específica
+    let errorMessage = 'Erro ao criar perfil. Tente novamente.'
+    
+    if (error.code === '23505') {
+      errorMessage = 'Você já possui um perfil cadastrado.'
+    } else if (error.code === '42501' || error.message.includes('permission')) {
+      errorMessage = 'Erro de permissão. Verifique as políticas RLS no Supabase.'
+    } else if (error.message) {
+      errorMessage = `Erro: ${error.message}`
+    }
+    
+    return { error: errorMessage }
   }
 
   revalidatePath('/', 'layout')
