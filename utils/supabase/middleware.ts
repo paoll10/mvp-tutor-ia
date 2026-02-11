@@ -75,6 +75,14 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
+  const isOnboarding = pathname.startsWith('/onboarding')
+  const isNoProfileRoute = NO_PROFILE_ROUTES.some(route => pathname.startsWith(route))
+
+  // Se já está no onboarding, permite acesso (evita loop)
+  if (isOnboarding) {
+    return supabaseResponse
+  }
+
   // Se HOUVER usuário logado
   // Verifica se tem profile cadastrado
   let profile: { role: string } | null = null
@@ -90,15 +98,13 @@ export async function updateSession(request: NextRequest) {
     
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
       console.error('Erro ao buscar profile:', error)
-      // Se o schema não existir, redireciona para onboarding
+      // Se o schema não existir, permite acesso ao onboarding
       if (error.message?.includes('schema') || error.message?.includes('does not exist')) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding'
-        return NextResponse.redirect(url)
+        // Não redireciona aqui, apenas permite que continue
+        hasProfile = false
+        profile = null
       }
-    }
-    
-    if (data) {
+    } else if (data) {
       profile = data
       hasProfile = true
     }
@@ -108,9 +114,6 @@ export async function updateSession(request: NextRequest) {
     hasProfile = false
     profile = null
   }
-
-  const isOnboarding = pathname.startsWith('/onboarding')
-  const isNoProfileRoute = NO_PROFILE_ROUTES.some(route => pathname.startsWith(route))
 
   // Se NÃO tem profile e NÃO está no onboarding → vai pro onboarding
   if (!hasProfile && !isNoProfileRoute) {
