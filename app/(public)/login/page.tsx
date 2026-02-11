@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { loginCustom } from '@/server/auth-custom';
 
 export default function LoginPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -14,13 +16,25 @@ export default function LoginPage() {
 
     const formData = new FormData(event.currentTarget);
 
-    const result = await loginCustom(formData);
+    try {
+      const result = await loginCustom(formData);
 
-    if (result?.error) {
-      setMessage(result.error);
+      if (result?.error) {
+        setMessage(result.error);
+        setIsLoading(false);
+      } else {
+        // Se não houver erro, o loginCustom já redireciona automaticamente
+        // Mas adicionamos um fallback caso o redirect não funcione
+        setTimeout(() => {
+          // Força reload para garantir que os cookies sejam lidos
+          window.location.href = '/';
+        }, 100);
+      }
+    } catch (err) {
+      console.error('Erro no login:', err);
+      setMessage('Erro ao fazer login. Tente novamente.');
       setIsLoading(false);
     }
-    // Se não houver erro, o loginCustom já redireciona automaticamente
   };
 
   return (

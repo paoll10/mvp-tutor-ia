@@ -77,12 +77,16 @@ export async function loginCustom(formData: FormData) {
     })
 
     revalidatePath('/', 'layout')
+    revalidatePath('/mentor/dashboard', 'layout')
+    revalidatePath('/student/dashboard', 'layout')
 
     // Redireciona baseado no role
     if (user.role === 'mentor') {
       redirect('/mentor/dashboard')
-    } else {
+    } else if (user.role === 'aluno') {
       redirect('/student/dashboard')
+    } else {
+      redirect('/login')
     }
   } catch (err: any) {
     console.error('Erro no login customizado:', err)
