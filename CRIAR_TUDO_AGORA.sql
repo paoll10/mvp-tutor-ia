@@ -63,19 +63,21 @@ CREATE TRIGGER update_users_updated_at
 
 -- 8. Dar permissões na tabela (com SELECT explícito)
 GRANT USAGE ON SCHEMA mentoria TO anon, authenticated, service_role;
+GRANT ALL ON SCHEMA mentoria TO anon, authenticated, service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE mentoria.users TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE mentoria.users TO anon;
 GRANT ALL ON TABLE mentoria.users TO service_role;
 
--- Habilitar RLS (Row Level Security) se necessário
-ALTER TABLE mentoria.users ENABLE ROW LEVEL SECURITY;
+-- Desabilitar RLS temporariamente para facilitar acesso
+ALTER TABLE mentoria.users DISABLE ROW LEVEL SECURITY;
 
--- Política para permitir leitura para usuários autenticados
-DROP POLICY IF EXISTS "Users are viewable by authenticated users" ON mentoria.users;
-CREATE POLICY "Users are viewable by authenticated users" 
-  ON mentoria.users FOR SELECT 
-  TO authenticated, anon
-  USING (true);
+-- Se quiser habilitar RLS depois, use esta política (comentada por enquanto):
+-- ALTER TABLE mentoria.users ENABLE ROW LEVEL SECURITY;
+-- DROP POLICY IF EXISTS "Users are viewable by all" ON mentoria.users;
+-- CREATE POLICY "Users are viewable by all" 
+--   ON mentoria.users FOR SELECT 
+--   TO authenticated, anon, service_role
+--   USING (true);
 
 -- 9. CRIAR USUÁRIO MENTOR
 -- Email: mentor@mentoria.com
