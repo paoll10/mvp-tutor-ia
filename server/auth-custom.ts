@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -12,6 +12,20 @@ export interface CustomUser {
   email: string
   role: 'mentor' | 'aluno'
   full_name: string | null
+}
+
+/**
+ * Cria cliente Supabase direto (sem SSR)
+ */
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Variáveis de ambiente do Supabase não configuradas')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
 }
 
 /**
@@ -29,13 +43,15 @@ export async function loginCustom(formData: FormData) {
   const normalizedEmail = email.toLowerCase().trim()
 
   try {
-    const supabase = await createClient()
+    // Cria cliente Supabase direto
+    const supabase = createSupabaseClient()
     
-    // Verifica se consegue conectar ao Supabase
-    if (!supabase) {
-      console.error('❌ Erro: Supabase client não inicializado')
-      return { error: 'Erro de conexão. Verifique as variáveis de ambiente.' }
-    }
+    console.log('\n' + '='.repeat(60))
+    console.log('🔍 TENTATIVA DE LOGIN')
+    console.log('='.repeat(60))
+    console.log('Email:', normalizedEmail)
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Configurado' : '❌ Faltando')
+    console.log('Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Configurado' : '❌ Faltando')
 
     // Busca o usuário na tabela customizada
     const { data: user, error: userError } = await supabase
@@ -45,18 +61,18 @@ export async function loginCustom(formData: FormData) {
       .eq('email', normalizedEmail)
       .maybeSingle()
 
-    // Log detalhado para debug
-    console.log('\n' + '='.repeat(60))
-    console.log('🔍 TENTATIVA DE LOGIN')
-    console.log('='.repeat(60))
-    console.log('Email:', normalizedEmail)
-    console.log('Usuário encontrado:', user ? '✅ Sim' : '❌ Não')
+    console.log('Resultado da busca:', { 
+      user: user ? '✅ Encontrado' : '❌ Não encontrado',
+      error: userError ? userError.message : 'Nenhum erro'
+    })
     
     if (userError) {
-      console.error('❌ Erro do Supabase:', userError)
-      console.error('Código:', userError.code)
-      console.error('Mensagem:', userError.message)
-      console.error('Detalhes:', userError.details)
+      console.error('❌ Erro do Supabase:', {
+        code: userError.code,
+        message: userError.message,
+        details: userError.details,
+        hint: userError.hint
+      })
       console.log('='.repeat(60) + '\n')
       
       // Mensagens de erro específicas
@@ -72,7 +88,7 @@ export async function loginCustom(formData: FormData) {
         return { error: 'Schema não encontrado. Execute: atualizar_tabela_users.sql no Supabase' }
       }
       
-      return { error: `Erro ao buscar usuário: ${userError.message || 'Erro desconhecido'}` }
+      return { error: `Erro: ${userError.message || 'Erro desconhecido'}` }
     }
 
     if (!user) {
@@ -82,7 +98,7 @@ export async function loginCustom(formData: FormData) {
     }
 
     console.log('✅ Usuário encontrado:', {
-      id: user.id,
+      id: user.id.substring(0, 8) + '...',
       email: user.email,
       role: user.role,
       temHash: !!user.password_hash,
@@ -97,7 +113,7 @@ export async function loginCustom(formData: FormData) {
     }
 
     if (user.password_hash.length < 20) {
-      console.error('❌ Hash de senha inválido (muito curto)')
+      console.error('❌ Hash de senha inválido (muito curto):', user.password_hash.length)
       console.log('='.repeat(60) + '\n')
       return { error: 'Hash de senha inválido. Execute: criar_login_simples.sql no Supabase' }
     }
@@ -110,7 +126,7 @@ export async function loginCustom(formData: FormData) {
       isValidPassword = await bcrypt.compare(password, user.password_hash)
       console.log('Resultado:', isValidPassword ? '✅ Senha válida' : '❌ Senha inválida')
     } catch (bcryptError: any) {
-      console.error('❌ Erro ao comparar senha:', bcryptError)
+      console.error('❌ Erro ao comparar senha:', bcryptError.message)
       console.log('='.repeat(60) + '\n')
       return { error: 'Erro ao verificar senha. Tente novamente.' }
     }
@@ -187,19 +203,11 @@ export async function loginCustom(formData: FormData) {
       return { error: 'Erro de conexão com o banco de dados. Verifique as variáveis de ambiente.' }
     }
     
+    if (err.message?.includes('Variáveis de ambiente')) {
+      return { error: 'Variáveis de ambiente não configuradas. Verifique NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.' }
+    }
+    
     return { error: `Erro ao fazer login: ${err.message || 'Erro desconhecido'}` }
-  }
-}
-
-/**
- * Verifica a senha usando bcrypt
- */
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  try {
-    return await bcrypt.compare(password, hash)
-  } catch (err) {
-    console.error('Erro ao verificar senha:', err)
-    return false
   }
 }
 
