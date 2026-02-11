@@ -46,11 +46,13 @@ export async function loginCustom(formData: FormData) {
     // Cria cliente Supabase
     const supabase = getSupabaseClient()
 
-    // Busca usuário - tenta sem schema primeiro, depois com schema
+    // Busca usuário - tenta com schema primeiro, depois sem schema
     let user: any = null
     let userError: any = null
 
-    // Tenta com schema mentoria
+    console.log('🔍 Buscando usuário:', normalizedEmail)
+
+    // Tenta com schema mentoria primeiro
     const result1 = await supabase
       .schema('mentoria')
       .from('users')
@@ -58,26 +60,38 @@ export async function loginCustom(formData: FormData) {
       .eq('email', normalizedEmail)
       .maybeSingle()
 
+    console.log('Resultado com schema:', {
+      temDados: !!result1.data,
+      temErro: !!result1.error,
+      erro: result1.error?.message
+    })
+
     if (result1.data) {
       user = result1.data
+      console.log('✅ Usuário encontrado com schema mentoria')
     } else if (result1.error) {
       userError = result1.error
+      console.log('⚠️ Erro com schema, tentando sem schema...')
       
-      // Se erro de schema, tenta sem schema
-      if (result1.error.message?.includes('schema') || result1.error.message?.includes('does not exist')) {
-        console.log('⚠️ Tentando sem schema...')
-        const result2 = await supabase
-          .from('users')
-          .select('id, email, password_hash, role, full_name')
-          .eq('email', normalizedEmail)
-          .maybeSingle()
-        
-        if (result2.data) {
-          user = result2.data
-          userError = null
-        } else if (result2.error) {
-          userError = result2.error
-        }
+      // Tenta sem schema (fallback)
+      const result2 = await supabase
+        .from('users')
+        .select('id, email, password_hash, role, full_name')
+        .eq('email', normalizedEmail)
+        .maybeSingle()
+      
+      console.log('Resultado sem schema:', {
+        temDados: !!result2.data,
+        temErro: !!result2.error,
+        erro: result2.error?.message
+      })
+      
+      if (result2.data) {
+        user = result2.data
+        userError = null
+        console.log('✅ Usuário encontrado sem schema')
+      } else if (result2.error) {
+        userError = result2.error
       }
     }
 
