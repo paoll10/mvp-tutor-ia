@@ -27,7 +27,7 @@ export async function login(formData: FormData) {
   if (data.user) {
     // Busca o profile do usuário para redirecionar corretamente
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .schema('mentoria')
         .from('profiles')
         .select('role')
@@ -36,15 +36,18 @@ export async function login(formData: FormData) {
 
       revalidatePath('/', 'layout')
 
-      // Se tem profile, redireciona para o dashboard correto
-      if (profile) {
+      // Se tem profile e não há erro, redireciona para o dashboard correto
+      if (profile && !profileError) {
         if (profile.role === 'mentor') {
           redirect('/mentor/dashboard')
         } else {
           redirect('/student/dashboard')
         }
       } else {
-        // Se não tem profile, vai para onboarding
+        // Se não tem profile ou erro (schema não existe, etc), vai para onboarding
+        if (profileError) {
+          console.error('Erro ao buscar profile:', profileError)
+        }
         redirect('/onboarding')
       }
     } catch (err) {
