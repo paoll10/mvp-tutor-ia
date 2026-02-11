@@ -58,41 +58,14 @@ export async function updateSession(request: NextRequest) {
   // Verifica se é rota pública
   const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/'
 
-  // Verifica se há sessão customizada (login via tabela)
-  const customUserId = request.cookies.get('custom_user_id')?.value
-  const customUserRole = request.cookies.get('custom_user_role')?.value as 'mentor' | 'aluno' | undefined
-
-  // Se houver sessão customizada, redireciona direto para o dashboard
-  if (customUserId && customUserRole) {
-    if (pathname.startsWith('/login') || pathname === '/') {
-      const url = request.nextUrl.clone()
-      url.pathname = customUserRole === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
-      return NextResponse.redirect(url)
-    }
-    // Permite acesso às rotas do role correto
-    if (customUserRole === 'mentor' && pathname.startsWith('/mentor')) {
-      return supabaseResponse
-    }
-    if (customUserRole === 'aluno' && (pathname.startsWith('/student') || pathname.startsWith('/student-course'))) {
-      return supabaseResponse
-    }
-    // Se tentar acessar rota de outro role, redireciona para o dashboard correto
-    if ((customUserRole === 'mentor' && !pathname.startsWith('/mentor')) || 
-        (customUserRole === 'aluno' && !pathname.startsWith('/student') && !pathname.startsWith('/student-course'))) {
-      const url = request.nextUrl.clone()
-      url.pathname = customUserRole === 'mentor' ? '/mentor/dashboard' : '/student/dashboard'
-      return NextResponse.redirect(url)
-    }
-  }
-
   // IMPORTANT: You *must* run the getUser method in the middleware
   // to maintain auth session (refreshing tokens, etc.)
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Se NÃO houver usuário (nem customizado nem Supabase Auth)
-  if (!user && !customUserId) {
+  // Se NÃO houver usuário
+  if (!user) {
     // E a rota NÃO for pública
     if (!isPublicRoute) {
       const url = request.nextUrl.clone()
@@ -115,13 +88,18 @@ export async function updateSession(request: NextRequest) {
   let profile: { role: string } | null = null
   let hasProfile = false
   
+  // Garantir que user não é null (já verificado acima)
+  if (!user) {
+    return supabaseResponse
+  }
+  
   try {
     const { data, error } = await supabase
       .schema('mentoria')
       .from('profiles')
       .select('role')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
     
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
       console.error('Erro ao buscar profile:', error)
