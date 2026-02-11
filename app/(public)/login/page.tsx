@@ -82,38 +82,81 @@ export default function LoginPage() {
         return;
       }
 
-      // Monitora o popup
-      const checkPopup = setInterval(async () => {
+      // Variável para armazenar o intervalo do popup
+      let checkPopup: NodeJS.Timeout | null = null;
+
+      // Listener para mensagens do popup
+      const messageHandler = async (event: MessageEvent) => {
+        // Verifica se a mensagem é do nosso domínio
+        if (event.origin !== window.location.origin) {
+          return;
+        }
+
+        if (event.data.type === 'OAUTH_SUCCESS') {
+          window.removeEventListener('message', messageHandler);
+          if (checkPopup) clearInterval(checkPopup);
+          
+          // Aguarda um pouco para garantir que a sessão foi salva
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Verifica se o usuário está autenticado
+          const { data: { session }, error } = await supabase.auth.getSession();
+          
+          if (session) {
+            // Login bem-sucedido! Redireciona para raiz
+            router.push('/');
+          } else {
+            console.error('Erro ao obter sessão após OAuth:', error);
+            setMessage('Erro ao fazer login. Tente novamente.');
+            setIsLoading(false);
+          }
+        } else if (event.data.type === 'OAUTH_ERROR') {
+          window.removeEventListener('message', messageHandler);
+          if (checkPopup) clearInterval(checkPopup);
+          setMessage(event.data.message || 'Erro ao fazer login com Google.');
+          setIsLoading(false);
+        }
+      };
+
+      window.addEventListener('message', messageHandler);
+
+      // Monitora o popup (apenas para detectar se foi fechado manualmente)
+      // Não tentamos acessar popup.closed ou popup.location devido a políticas CORS
+      checkPopup = setInterval(async () => {
         try {
-          // Verifica se o popup foi fechado
-          if (popup.closed) {
-            clearInterval(checkPopup);
-            
-            // Verifica se o usuário está autenticado
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session) {
-              // Login bem-sucedido! Redireciona para raiz
-              // O middleware vai verificar se tem profile e redirecionar corretamente
-              router.push('/');
-            } else {
-              setIsLoading(false);
-            }
-            return;
+          // Tenta verificar se o popup foi fechado (pode falhar por CORS, mas não é crítico)
+          let isClosed = false;
+          try {
+            isClosed = popup.closed;
+          } catch {
+            // Erro de cross-origin é esperado - ignoramos silenciosamente
           }
 
-          // Tenta verificar a URL do popup (só funciona se for do mesmo domínio)
-          if (popup.location.href.includes('/auth/callback')) {
-            popup.close();
+          if (isClosed) {
+            if (checkPopup) clearInterval(checkPopup);
+            window.removeEventListener('message', messageHandler);
+            
+            // Se o popup foi fechado sem mensagem, pode ter sido cancelado pelo usuário
+            // Aguarda um pouco e verifica se há sessão
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+              // Popup foi fechado sem sucesso
+              setIsLoading(false);
+            }
+            // Se tem sessão, a mensagem de sucesso já foi recebida e o redirecionamento já aconteceu
           }
-        } catch {
-          // Erro de cross-origin é esperado enquanto estiver no Google
+        } catch (err) {
+          // Ignora erros de CORS silenciosamente
         }
-      }, 500);
+      }, 1000); // Verifica a cada 1 segundo (menos frequente para evitar muitos erros)
 
       // Timeout de segurança (5 minutos)
       setTimeout(() => {
-        clearInterval(checkPopup);
+        if (checkPopup) clearInterval(checkPopup);
+        window.removeEventListener('message', messageHandler);
         if (!popup.closed) {
           popup.close();
         }

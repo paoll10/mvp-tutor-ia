@@ -11,8 +11,20 @@ export default function OAuthSuccessPage() {
     const isPopup = window.opener !== null;
     
     if (isPopup) {
+      // Envia mensagem para a janela pai informando sucesso
+      try {
+        window.opener.postMessage(
+          { type: 'OAUTH_SUCCESS' },
+          window.location.origin
+        );
+      } catch (err) {
+        console.error('Erro ao enviar mensagem para janela pai:', err);
+      }
+      
       // Fecha o popup - a janela pai vai detectar e redirecionar
-      window.close();
+      setTimeout(() => {
+        window.close();
+      }, 100);
     } else {
       // Se não for popup, redireciona para a raiz
       // O middleware vai verificar se tem profile e redirecionar corretamente

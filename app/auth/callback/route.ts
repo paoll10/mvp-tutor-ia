@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     console.error('Descrição:', errorDescription)
     console.error('='.repeat(60) + '\n')
     
-    return NextResponse.redirect(new URL(`/login?error=oauth_error&message=${encodeURIComponent(errorDescription || errorParam)}`, request.url))
+    return NextResponse.redirect(new URL(`/auth/callback/error?error=${errorParam}&message=${encodeURIComponent(errorDescription || errorParam)}`, request.url))
   }
   
   if (code) {
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Configurado' : '❌ FALTANDO')
       console.error('='.repeat(60) + '\n')
       
-      return NextResponse.redirect(new URL('/login?error=config_error&message=Variáveis de ambiente não configuradas', request.url))
+      return NextResponse.redirect(new URL('/auth/callback/error?error=config_error&message=Variáveis de ambiente não configuradas', request.url))
     }
     
     try {
@@ -71,8 +71,8 @@ export async function GET(request: NextRequest) {
         console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurado' : 'FALTANDO')
         console.error('='.repeat(60) + '\n')
         
-        // Redireciona com o erro específico
-        return NextResponse.redirect(new URL(`/login?error=auth_code_error&message=${encodeURIComponent(error.message)}`, request.url))
+        // Redireciona para página de erro que comunica com o popup
+        return NextResponse.redirect(new URL(`/auth/callback/error?error=auth_code_error&message=${encodeURIComponent(error.message)}`, request.url))
       }
       
       if (data && data.session) {
@@ -99,11 +99,11 @@ export async function GET(request: NextRequest) {
       console.error('Stack:', err.stack)
       console.error('='.repeat(60) + '\n')
       
-      return NextResponse.redirect(new URL(`/login?error=callback_exception&message=${encodeURIComponent(err.message)}`, request.url))
+      return NextResponse.redirect(new URL(`/auth/callback/error?error=callback_exception&message=${encodeURIComponent(err.message)}`, request.url))
     }
   }
 
   // return the user to an error page with some instructions
-  return NextResponse.redirect(new URL('/login?error=auth_code_error', request.url))
+  return NextResponse.redirect(new URL('/auth/callback/error?error=auth_code_error&message=Nenhum código de autenticação encontrado', request.url))
 }
 
