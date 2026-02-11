@@ -61,7 +61,9 @@ export async function GET(request: NextRequest) {
         console.error('❌ ERRO AO TROCAR CÓDIGO POR SESSÃO (OAuth)')
         console.error('='.repeat(60))
         console.error('\n🔴 ERRO:')
-        console.error(JSON.stringify(error, null, 2))
+        console.error('Mensagem:', error.message)
+        console.error('Status:', error.status)
+        console.error('Detalhes:', JSON.stringify(error, null, 2))
         console.error('\n📋 CODE RECEBIDO:')
         console.error(code.substring(0, 50) + '...')
         console.error('\n🌐 URL COMPLETA:')
@@ -69,10 +71,21 @@ export async function GET(request: NextRequest) {
         console.error('\n🔧 VARIÁVEIS DE AMBIENTE:')
         console.error('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
         console.error('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Configurado' : 'FALTANDO')
+        console.error('\n💡 POSSÍVEIS CAUSAS:')
+        console.error('1. Site URL no Supabase não corresponde ao domínio')
+        console.error('2. Redirect URLs não configurado corretamente')
+        console.error('3. Credenciais do Google incorretas no Supabase')
+        console.error('4. Código OAuth expirado (tente novamente)')
         console.error('='.repeat(60) + '\n')
         
+        // Mensagem de erro mais amigável
+        let errorMessage = error.message;
+        if (error.message.includes('Unable to exchange external code')) {
+          errorMessage = 'Erro ao processar login. Verifique se o Site URL no Supabase está correto (deve ser: https://mvp-tutor-ia-78pi.vercel.app sem /auth/callback).';
+        }
+        
         // Redireciona para página de erro que comunica com o popup
-        return NextResponse.redirect(new URL(`/auth/callback/error?error=auth_code_error&message=${encodeURIComponent(error.message)}`, request.url))
+        return NextResponse.redirect(new URL(`/auth/callback/error?error=auth_code_error&message=${encodeURIComponent(errorMessage)}`, request.url))
       }
       
       if (data && data.session) {
