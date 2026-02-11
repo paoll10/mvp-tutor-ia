@@ -27,27 +27,29 @@ export async function login(formData: FormData) {
   if (data.user) {
     revalidatePath('/', 'layout')
     
-    // Busca o profile do usuário para redirecionar corretamente
-    // Se der erro, deixa o middleware redirecionar (não quebra com erro 500)
-    const { data: profile } = await supabase
-      .schema('mentoria')
-      .from('profiles')
-      .select('role')
-      .eq('user_id', data.user.id)
-      .single()
-      .catch(() => ({ data: null, error: null }))
+    // Tenta buscar o profile, mas não quebra se der erro
+    try {
+      const { data: profile } = await supabase
+        .schema('mentoria')
+        .from('profiles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .single()
 
-    // Se tem profile, redireciona para o dashboard correto
-    if (profile?.role) {
-      if (profile.role === 'mentor') {
-        redirect('/mentor/dashboard')
-      } else {
-        redirect('/student/dashboard')
+      // Se tem profile, redireciona para o dashboard correto
+      if (profile?.role) {
+        if (profile.role === 'mentor') {
+          redirect('/mentor/dashboard')
+        } else if (profile.role === 'aluno') {
+          redirect('/student/dashboard')
+        }
       }
+    } catch (err) {
+      // Ignora erro silenciosamente - o middleware vai tratar
+      console.error('Erro ao buscar profile (não crítico):', err)
     }
     
-    // Se não tem profile, redireciona para raiz
-    // O middleware vai verificar e redirecionar para onboarding se necessário
+    // Sempre redireciona para raiz - o middleware vai verificar o profile e redirecionar
     redirect('/')
   } else {
     revalidatePath('/', 'layout')
