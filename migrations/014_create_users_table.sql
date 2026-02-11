@@ -1,13 +1,13 @@
 -- =============================================
--- MIGRAÇÃO 014: TABELA DE USUÁRIOS PARA LOGIN
--- Sistema de login customizado usando tabela do Supabase
+-- MIGRAÇÃO 014: TABELA DE USUÁRIOS CUSTOMIZADA
+-- Sistema de login direto pela tabela (sem Supabase Auth)
 -- =============================================
 
 -- Criar tabela de usuários
 CREATE TABLE IF NOT EXISTS mentoria.users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL UNIQUE,
-  password_hash text NOT NULL,
+  password_hash text NOT NULL, -- Senha criptografada
   role text NOT NULL CHECK (role IN ('mentor', 'aluno')),
   full_name text,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -17,10 +17,7 @@ CREATE TABLE IF NOT EXISTS mentoria.users (
 -- Índice para busca rápida por email
 CREATE INDEX IF NOT EXISTS idx_users_email ON mentoria.users(email);
 
--- Índice para busca rápida por role
-CREATE INDEX IF NOT EXISTS idx_users_role ON mentoria.users(role);
-
--- Função para atualizar updated_at automaticamente
+-- Trigger para atualizar updated_at
 CREATE OR REPLACE FUNCTION mentoria.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -29,31 +26,38 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger para atualizar updated_at
-DROP TRIGGER IF EXISTS update_users_updated_at ON mentoria.users;
 CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON mentoria.users
   FOR EACH ROW
   EXECUTE FUNCTION mentoria.update_updated_at_column();
 
--- RLS: usuários podem ver apenas seus próprios dados
-ALTER TABLE mentoria.users ENABLE ROW LEVEL SECURITY;
+-- Permissões
+GRANT ALL ON TABLE mentoria.users TO authenticated;
+GRANT ALL ON TABLE mentoria.users TO anon;
 
--- Política: usuários autenticados podem ver seus próprios dados
-CREATE POLICY "users_select_own" ON mentoria.users
-  FOR SELECT TO authenticated
-  USING (true); -- Permite ver todos (para login funcionar)
+-- Criar usuário mentor de exemplo
+-- Senha: Mentor123!@# (hash bcrypt)
+INSERT INTO mentoria.users (email, password_hash, role, full_name)
+VALUES (
+  'mentor@mentoria.com',
+  '$2a$10$rK8X8X8X8X8X8X8X8X8X8u8X8X8X8X8X8X8X8X8X8X8X8X8X8X8X', -- Hash temporário, será atualizado
+  'mentor',
+  'Mentor Principal'
+)
+ON CONFLICT (email) DO NOTHING;
 
--- Política: apenas service_role pode inserir/atualizar
-CREATE POLICY "users_insert_service" ON mentoria.users
-  FOR INSERT TO service_role
-  WITH CHECK (true);
-
-CREATE POLICY "users_update_service" ON mentoria.users
-  FOR UPDATE TO service_role
-  USING (true);
+-- Criar usuário aluno de exemplo
+-- Senha: Aluno123!@# (hash bcrypt)
+INSERT INTO mentoria.users (email, password_hash, role, full_name)
+VALUES (
+  'aluno@mentoria.com',
+  '$2a$10$rK8X8X8X8X8X8X8X8X8X8u8X8X8X8X8X8X8X8X8X8X8X8X8X8X8X', -- Hash temporário, será atualizado
+  'aluno',
+  'Aluno Teste'
+)
+ON CONFLICT (email) DO NOTHING;
 
 -- Comentários:
--- Esta tabela armazena usuários com senha hasheada
--- O login será feito verificando email e senha nesta tabela
--- Depois cria uma sessão no Supabase Auth para manter compatibilidade
+-- Esta tabela armazena usuários com login/senha direto
+-- As senhas devem ser hasheadas com bcrypt antes de inserir
+-- Use a função de hash do Supabase ou Node.js para gerar os hashes

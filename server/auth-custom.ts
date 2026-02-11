@@ -4,6 +4,15 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import bcrypt from 'bcryptjs'
+
+// Interface para usuário customizado
+export interface CustomUser {
+  id: string
+  email: string
+  role: 'mentor' | 'aluno'
+  full_name: string | null
+}
 
 /**
  * Faz login usando a tabela customizada de usuários
@@ -13,14 +22,9 @@ export async function loginCustom(formData: FormData) {
   
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-  const role = formData.get('role') as string // 'mentor' ou 'aluno'
 
   if (!email || !password) {
     return { error: 'Por favor, forneça email e senha' }
-  }
-
-  if (!role || !['mentor', 'aluno'].includes(role)) {
-    return { error: 'Por favor, selecione um perfil (Mentor ou Aluno)' }
   }
 
   try {
@@ -30,58 +34,51 @@ export async function loginCustom(formData: FormData) {
       .from('users')
       .select('id, email, password_hash, role, full_name')
       .eq('email', email.toLowerCase().trim())
-      .eq('role', role)
       .single()
 
     if (userError || !user) {
       return { error: 'Email ou senha incorretos' }
     }
 
-    // Verifica a senha usando função SQL (se disponível) ou comparação direta
-    let isValid = false
-    
-    try {
-      const { data: verifyResult } = await supabase.rpc('verify_password', {
-        p_password: password,
-        p_hash: user.password_hash
-      })
-      isValid = verifyResult === true
-    } catch (err) {
-      // Se a função não existir, usa comparação direta (apenas para desenvolvimento)
-      // Em produção, você DEVE ter a função verify_password
-      console.warn('Função verify_password não encontrada, usando verificação direta (não seguro)')
-      // Compara hash diretamente (temporário - não seguro)
-      isValid = user.password_hash === password || user.password_hash.includes(password)
-    }
+    // Verifica a senha usando bcrypt
+    // Nota: Em produção, use uma biblioteca de bcrypt no servidor
+    // Por enquanto, vamos usar uma verificação simples
+    const isValidPassword = await verifyPassword(password, user.password_hash)
 
-    if (!isValid) {
+    if (!isValidPassword) {
       return { error: 'Email ou senha incorretos' }
     }
 
-    // Cria uma sessão customizada usando cookies
+    // Cria sessão usando cookies
     const cookieStore = await cookies()
-    cookieStore.set('custom_user_id', user.id, {
+    const sessionToken = generateSessionToken()
+    
+    // Salva a sessão (você pode criar uma tabela de sessões se quiser)
+    cookieStore.set('custom_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 dias
+      path: '/',
     })
-    cookieStore.set('custom_user_role', user.role, {
+
+    // Salva dados do usuário no cookie (criptografado seria melhor)
+    cookieStore.set('user_data', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      full_name: user.full_name,
+    }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
-    })
-    cookieStore.set('custom_user_email', user.email, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
     })
 
     revalidatePath('/', 'layout')
 
-    // Redireciona para o dashboard correto
+    // Redireciona baseado no role
     if (user.role === 'mentor') {
       redirect('/mentor/dashboard')
     } else {
@@ -94,69 +91,50 @@ export async function loginCustom(formData: FormData) {
 }
 
 /**
- * Cria um novo usuário na tabela customizada
+ * Verifica a senha usando bcrypt
  */
-export async function signupCustom(formData: FormData) {
-  const supabase = await createClient()
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  try {
+    return await bcrypt.compare(password, hash)
+  } catch (err) {
+    console.error('Erro ao verificar senha:', err)
+    return false
+  }
+}
+
+/**
+ * Gera um token de sessão
+ */
+function generateSessionToken(): string {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15)
+}
+
+/**
+ * Obtém o usuário atual da sessão customizada
+ */
+export async function getCurrentCustomUser(): Promise<CustomUser | null> {
+  const cookieStore = await cookies()
+  const userData = cookieStore.get('user_data')
   
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
-  const role = formData.get('role') as string
-  const fullName = formData.get('full_name') as string | null
-
-  if (!email || !password) {
-    return { error: 'Por favor, forneça email e senha' }
-  }
-
-  if (!role || !['mentor', 'aluno'].includes(role)) {
-    return { error: 'Por favor, selecione um perfil (Mentor ou Aluno)' }
-  }
-
-  // Valida formato de email
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) {
-    return { error: 'Email inválido' }
-  }
-
-  // Valida senha (mínimo 6 caracteres)
-  if (password.length < 6) {
-    return { error: 'Senha deve ter no mínimo 6 caracteres' }
+  if (!userData?.value) {
+    return null
   }
 
   try {
-    // Hash da senha usando a função SQL
-    const { data: passwordHash, error: hashError } = await supabase.rpc('hash_password', {
-      p_password: password
-    })
-
-    if (hashError || !passwordHash) {
-      return { error: 'Erro ao processar senha. Tente novamente.' }
-    }
-
-    // Insere o usuário na tabela customizada
-    const { error: insertError } = await supabase
-      .schema('mentoria')
-      .from('users')
-      .insert({
-        email: email.toLowerCase().trim(),
-        password_hash: passwordHash,
-        role: role,
-        full_name: fullName || email.split('@')[0],
-      })
-
-    if (insertError) {
-      if (insertError.code === '23505') {
-        return { error: 'Este email já está cadastrado' }
-      }
-      return { error: insertError.message }
-    }
-
-    revalidatePath('/', 'layout')
-    
-    // Faz login automaticamente após criar conta
-    return await loginCustom(formData)
-  } catch (err: any) {
-    console.error('Erro ao criar usuário:', err)
-    return { error: 'Erro ao criar conta. Tente novamente.' }
+    return JSON.parse(userData.value) as CustomUser
+  } catch {
+    return null
   }
+}
+
+/**
+ * Faz logout
+ */
+export async function logoutCustom() {
+  const cookieStore = await cookies()
+  cookieStore.delete('custom_session')
+  cookieStore.delete('user_data')
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }
