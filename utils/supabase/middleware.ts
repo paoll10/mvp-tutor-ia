@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
 
   // Se HOUVER usuário logado
   // Verifica se tem profile cadastrado
-  let profile = null
+  let profile: { role: string } | null = null
   let hasProfile = false
   
   try {
@@ -80,12 +80,15 @@ export async function updateSession(request: NextRequest) {
       }
     }
     
-    profile = data
-    hasProfile = !!profile
+    if (data) {
+      profile = data
+      hasProfile = true
+    }
   } catch (err) {
     console.error('Erro ao verificar profile:', err)
     // Em caso de erro, permite acesso ao onboarding
     hasProfile = false
+    profile = null
   }
 
   const isOnboarding = pathname.startsWith('/onboarding')
